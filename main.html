@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Quest: Main Menu</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e1e2f 0%, #2d1b69 100%);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      position: relative;
+      text-align: center;
+    }
+    .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+    .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; }
+    @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+    .menu-container {
+      position: relative;
+      z-index: 10;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px 80px 20px;
+    }
+    .title {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin: 40px 0 16px 0;
+      letter-spacing: 2px;
+    }
+    .parts-list {
+      margin: 50px 0 40px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      align-items: center;
+    }
+    .part-btn {
+      padding: 20px 60px;
+      font-size: 1.2em;
+      border-radius: 18px;
+      background: linear-gradient(90deg, #ffd700, #00ffff);
+      color: #222;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 16px rgba(0,255,255,0.13);
+      transition: background 0.3s, color 0.3s, transform 0.2s;
+    }
+    .part-btn:hover {
+      background: linear-gradient(90deg, #00ffff, #ffd700);
+      color: #111;
+      transform: scale(1.05);
+    }
+    .login-form {
+      background: rgba(0,0,0,0.5);
+      border: 2px solid #00ffff;
+      border-radius: 15px;
+      padding: 18px 30px;
+      max-width: 350px;
+      margin: 30px auto 40px auto;
+      text-align: center;
+    }
+    .login-form input {
+      margin: 8px 0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #00ffff;
+      font-size: 1em;
+    }
+    .login-form button {
+      margin-top: 10px;
+      background: linear-gradient(90deg, #00ffff, #ffd700);
+      color: #222;
+      font-weight: bold;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .login-form button:hover {
+      background: linear-gradient(90deg, #ffd700, #00ffff);
+      color: #111;
+    }
+    #currentUser {
+      color: #00ffff;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .hud {
+      position: fixed;
+      top: 20px; right: 20px;
+      background: rgba(41, 41, 72, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px 25px;
+      border-radius: 15px;
+      border: 2px solid #00ffff;
+      font-weight: bold;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(0, 255, 255, 0.3);
+      min-width: 230px;
+      text-align: left;
+    }
+    @media (max-width: 600px) {
+      .menu-container { padding: 15px 2vw 50px 2vw; }
+      .hud { position: static; margin-bottom: 20px; }
+      .parts-list { gap: 14px; }
+      .part-btn { width: 95%; }
+    }
+  </style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="hud">
+  <div>🌟 Total XP: <span id="totalXP">0</span></div>
+  <div>🎯 Progress: <span id="progressText">0%</span></div>
+  <div style="margin-top:10px;">
+    👤 User: <span id="currentUser">Not logged in</span>
+    <button onclick="logout()" style="margin-left:10px;padding:4px 12px;font-size:0.95em;border-radius:8px;border:none;background:#222;color:#00ffff;cursor:pointer;">Logout</button>
+  </div>
+</div>
+
+<!-- Login Form -->
+<div id="loginSection" class="login-form">
+  <h2>Login to Save Progress</h2>
+  <input type="text" id="loginUsername" placeholder="Username"><br>
+  <input type="password" id="loginPassword" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+  <div id="loginMsg" style="color:#ffd700;margin-top:10px;"></div>
+</div>
+
+<div class="menu-container" id="mainMenuContent" style="display:none;">
+
+  <div class="title">Code Quest</div>
+  <div style="font-size:1.15em;color:#00ffff;">Choose your adventure part:</div>
+  <div class="parts-list">
+    <button class="part-btn" onclick="location.href='index.html'">Part One: Beginner & Core</button>
+    <button class="part-btn" id="part2btn" disabled style="opacity:0.6;cursor:not-allowed;">Part Two: Advanced Mastery</button>
+    <button class="part-btn" onclick="partComingSoon('Part Three')">Part Three</button>
+    <button class="part-btn" onclick="partComingSoon('Part Four')">Part Four</button>
+  </div>
+</div>
+
+<script>
+let currentUser = null;
+let userProgress = {};
+let userXP = 0;
+
+// Shared login state: store username/password in localStorage, so all pages access
+function setLoginSession(u, p) {
+  localStorage.setItem('cq_current_user', JSON.stringify({username: u, password: p}));
+}
+function getLoginSession() {
+  try {
+    return JSON.parse(localStorage.getItem('cq_current_user'));
+  } catch(e) { return null; }
+}
+function clearLoginSession() {
+  localStorage.removeItem('cq_current_user');
+}
+
+function login(auto) {
+  let username, password;
+  if (auto) {
+    const session = getLoginSession();
+    if (!session) return;
+    username = session.username;
+    password = session.password;
+  } else {
+    username = document.getElementById('loginUsername').value.trim();
+    password = document.getElementById('loginPassword').value;
+    if (!username || !password) {
+      document.getElementById('loginMsg').textContent = "Enter username and password.";
+      return;
+    }
+    setLoginSession(username, password);
+  }
+  const userKey = `cq_user_${username}_${password}`;
+  let saved = localStorage.getItem(userKey);
+  if (!saved) {
+    userProgress = {
+      levels12: false,
+      levels34: false,
+      levels56: false,
+      levels78: false,
+      levels910: false,
+      xp: 0
+    };
+    localStorage.setItem(userKey, JSON.stringify(userProgress));
+  } else {
+    userProgress = JSON.parse(saved);
+  }
+  currentUser = { username, password, key: userKey };
+  userXP = userProgress.xp || 0;
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('mainMenuContent').style.display = '';
+  document.getElementById('currentUser').textContent = username;
+  updateDisplay();
+  checkPartsUnlock();
+}
+function saveProgress() {
+  if (currentUser) {
+    userProgress.xp = userXP;
+    localStorage.setItem(currentUser.key, JSON.stringify(userProgress));
+  }
+}
+function logout() {
+  clearLoginSession();
+  currentUser = null;
+  userProgress = {};
+  userXP = 0;
+  document.getElementById('mainMenuContent').style.display = 'none';
+  document.getElementById('loginSection').style.display = '';
+  document.getElementById('currentUser').textContent = "Not logged in";
+  document.getElementById('part2btn').disabled = true;
+  document.getElementById('part2btn').style.opacity = "0.6";
+  document.getElementById('part2btn').style.cursor = "not-allowed";
+}
+function partComingSoon(part) {
+  alert(part + " is coming soon!");
+}
+function updateDisplay() {
+  document.getElementById("totalXP").textContent = userXP || 0;
+  const completedLevels = Object.values(userProgress).filter(Boolean).length - (userProgress.xp !== undefined ? 1 : 0);
+  const progress = (completedLevels / 5) * 100;
+  document.getElementById("progressText").textContent = Math.round(progress) + '%';
+}
+function checkPartsUnlock() {
+  // Only enable Part Two button if all Part One levels are complete
+  const allPart1 = userProgress.levels12 && userProgress.levels34 && userProgress.levels56 && userProgress.levels78 && userProgress.levels910;
+  const part2btn = document.getElementById('part2btn');
+  if (allPart1) {
+    part2btn.disabled = false;
+    part2btn.style.opacity = '';
+    part2btn.style.cursor = '';
+    part2btn.onclick = () => location.href = 'index-advanced.html';
+  } else {
+    part2btn.disabled = true;
+    part2btn.style.opacity = '0.6';
+    part2btn.style.cursor = 'not-allowed';
+    part2btn.onclick = () => alert('Finish all of Part One to unlock Part Two!');
+  }
+}
+function createStars() {
+  const starsContainer = document.getElementById('stars');
+  for (let i = 0; i < 100; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+    star.style.animationDelay = Math.random() * 2 + 's';
+    starsContainer.appendChild(star);
+  }
+}
+
+window.onload = function() {
+  createStars();
+  // Try auto-login if session exists
+  const session = getLoginSession();
+  if (session) {
+    login(true);
+  }
+};
+</script>
+</body>
+</html>

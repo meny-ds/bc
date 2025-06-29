@@ -1,0 +1,2606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Quest: Levels 11-12 - Advanced Logic & Game Development</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e1e2f 0%, #2d1b69 20%, #4a148c 40%, #6a1b9a 100%);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      min-height: 100vh;
+    }
+    
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite alternate;
+    }
+    
+    @keyframes twinkle {
+      0% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+    
+    .game-container {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .hud {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(41, 41, 72, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px 25px;
+      border-radius: 15px;
+      border: 2px solid #9c27b0;
+      font-weight: bold;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(156, 39, 176, 0.3);
+    }
+    
+    .progress-bar {
+      width: 200px;
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      margin: 5px 0;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #9c27b0, #e91e63);
+      transition: width 0.5s ease;
+      border-radius: 4px;
+    }
+    
+    header {
+      text-align: center;
+      background: rgba(21, 21, 43, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(156, 39, 176, 0.3);
+    }
+    
+    .level-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .level-card {
+      background: rgba(41, 41, 72, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px solid #444;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .level-card:hover {
+      border-color: #9c27b0;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(156, 39, 176, 0.3);
+    }
+    
+    .level-card.active {
+      border-color: #9c27b0;
+      background: rgba(156, 39, 176, 0.1);
+    }
+    
+    .level-card.completed {
+      border-color: #00ff00;
+      background: rgba(0, 255, 0, 0.1);
+    }
+    
+    .section {
+      background: rgba(41, 41, 72, 0.8);
+      backdrop-filter: blur(10px);
+      margin: 20px 0;
+      padding: 30px;
+      border-radius: 20px;
+      border: 2px dashed #9c27b0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .button {
+      padding: 12px 24px;
+      margin: 8px;
+      background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+    
+    .button:hover {
+      background: linear-gradient(45deg, #8e24aa, #6a1b9a);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .code-editor {
+      background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+      color: #d4d4d4;
+      padding: 25px;
+      border-radius: 15px;
+      font-family: 'Courier New', monospace;
+      text-align: left;
+      margin: 20px 0;
+      border: 2px solid #666;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+    
+    .code-output {
+      background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+      color: #00ff88;
+      padding: 20px;
+      border-radius: 15px;
+      font-family: 'Courier New', monospace;
+      text-align: left;
+      margin: 20px 0;
+      border: 2px solid #00ff88;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+      font-size: 1.1em;
+    }
+    
+    textarea {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+      color: #d4d4d4;
+      border: 2px solid #666;
+      border-radius: 15px;
+      padding: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      resize: vertical;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+      line-height: 1.5;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: #9c27b0;
+      box-shadow: 0 0 20px rgba(156, 39, 176, 0.3);
+      background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
+    }
+    
+    .tip-box {
+      background: linear-gradient(45deg, #2a2a4a, #3a3a5a, #4a4a6a);
+      border-left: 8px solid #ff9800;
+      border-radius: 15px;
+      padding: 25px;
+      margin: 25px 0;
+      box-shadow: 0 0 20px rgba(255, 152, 0, 0.2);
+    }
+    
+    .tip-box h3 {
+      color: #ff9800;
+      margin-top: 0;
+      font-size: 1.3em;
+    }
+    
+    .lesson-tabs {
+      display: flex;
+      justify-content: center;
+      margin: 25px 0;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .lesson-tab {
+      padding: 12px 25px;
+      background: rgba(156, 39, 176, 0.1);
+      border: 2px solid #9c27b0;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+    
+    .lesson-tab.active {
+      background: #9c27b0;
+      color: white;
+      box-shadow: 0 0 15px rgba(156, 39, 176, 0.5);
+    }
+    
+    .lesson-tab:hover {
+      background: rgba(156, 39, 176, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin: 30px auto;
+      max-width: 800px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .nav-btn {
+      background: linear-gradient(45deg, #444, #666);
+      color: #9c27b0;
+      padding: 12px 24px;
+      border: 2px solid #9c27b0;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 150px;
+      text-align: center;
+    }
+    
+    .nav-btn:hover {
+      background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(156, 39, 176, 0.3);
+    }
+    
+    .logic-examples {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin: 25px 0;
+    }
+    
+    .logic-card {
+      background: linear-gradient(135deg, #1b1b33, #2b2b43);
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px solid #9c27b0;
+      box-shadow: 0 0 15px rgba(156, 39, 176, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .logic-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(156, 39, 176, 0.3);
+    }
+    
+    .logic-card h4 {
+      color: #ff9800;
+      margin-top: 0;
+    }
+    
+    .game-examples {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin: 25px 0;
+    }
+    
+    .game-card {
+      background: linear-gradient(135deg, #1b1b33, #2b2b43);
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px solid #e91e63;
+      box-shadow: 0 0 15px rgba(233, 30, 99, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .game-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(233, 30, 99, 0.3);
+    }
+    
+    .game-card h4 {
+      color: #ff9800;
+      margin-top: 0;
+    }
+    
+    .interactive-game {
+      background: linear-gradient(135deg, #2a2a4a, #3a3a5a);
+      border: 2px solid #e91e63;
+      border-radius: 15px;
+      padding: 25px;
+      margin: 25px 0;
+      text-align: center;
+    }
+    
+    .game-button {
+      padding: 15px 30px;
+      margin: 10px;
+      background: linear-gradient(45deg, #e91e63, #c2185b);
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      min-width: 120px;
+    }
+    
+    .game-button:hover {
+      background: linear-gradient(45deg, #d81b60, #ad1457);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(233, 30, 99, 0.4);
+    }
+    
+    .game-button:disabled {
+      background: #666;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    @media (max-width: 768px) {
+      .game-container {
+        padding: 10px;
+      }
+      
+      .level-selector {
+        grid-template-columns: 1fr;
+      }
+      
+      .hud {
+        position: static;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="hud">
+  <div>🌟 Total XP: <span id="totalXP">0</span></div>
+  <div>🎯 Current Level: <span id="currentLevel">11-12</span></div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div>📈 Progress: <span id="progressText">0%</span></div>
+</div>
+
+<div class="game-container">
+
+<header>
+  <h1>🎮 Code Quest: Levels 11-12</h1>
+  <p>Advanced Logic & Conditionals + Game Development</p>
+  
+  <div class="level-selector">
+    <div class="level-card" onclick="goToLevel('logic')" id="logicCard">
+      <h3>🧠 Level 11: Advanced Logic</h3>
+      <p>Boolean Logic, Complex Conditions</p>
+      <div>Master logical thinking</div>
+    </div>
+    <div class="level-card" onclick="goToLevel('game')" id="gameCard">
+      <h3>🎮 Level 12: Game Development</h3>
+      <p>Interactive Games, Random Events</p>
+      <div>Build complete games</div>
+    </div>
+  </div>
+</header>
+
+<!-- Level 11: Advanced Logic -->
+<div id="logicLevel" class="section hidden">
+  <h2>🧠 Advanced Logic & Boolean Operations</h2>
+  
+  <div class="lesson-tabs">
+    <div class="lesson-tab active" onclick="showLogicLesson(1)">🔗 Logical Operators</div>
+    <div class="lesson-tab" onclick="showLogicLesson(2)">🌐 Complex Conditions</div>
+    <div class="lesson-tab" onclick="showLogicLesson(3)">🏆 Challenge</div>
+  </div>
+
+  <div id="logicLesson1" class="hidden">
+    <h3>🔗 Logical Operators - AND, OR, NOT</h3>
+    <p>Logical operators allow you to combine multiple conditions and create sophisticated decision-making logic in your programs.</p>
+    
+    <div class="logic-examples">
+      <div class="logic-card">
+        <h4>🔗 AND Operator</h4>
+        <div class="code-editor">
+          # Both conditions must be True<br>
+          age = 20<br>
+          has_license = True<br><br>
+          
+          if age >= 18 and has_license:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("Can drive! 🚗")<br>
+          else:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("Cannot drive yet")<br><br>
+          
+          # Multiple AND conditions<br>
+          score = 85<br>
+          attendance = 95<br>
+          if score >= 80 and attendance >= 90:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("Honor roll! 🏆")
+        </div>
+      </div>
+      
+      <div class="logic-card">
+        <h4>🔀 OR Operator</h4>
+        <div class="code-editor">
+          # At least one condition must be True<br>
+          weekend = True<br>
+          holiday = False<br><br>
+          
+          if weekend or holiday:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("No work today! 🎉")<br>
+          else:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("Work day 💼")<br><br>
+          
+          # Emergency conditions<br>
+          fire = False<br>
+          earthquake = False<br>
+          if fire or earthquake:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("EVACUATE! 🚨")
+        </div>
+      </div>
+      
+      <div class="logic-card">
+        <h4>❌ NOT Operator</h4>
+        <div class="code-editor">
+          # Reverses the boolean value<br>
+          is_raining = False<br><br>
+          
+          if not is_raining:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("Perfect day for a picnic! ☀️")<br>
+          else:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("Stay inside 🌧️")<br><br>
+          
+          # Checking for invalid input<br>
+          password = "abc123"<br>
+          if not (len(password) >= 8):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("Password too short!")
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <h3>🔑 Truth Table Reference</h3>
+      <p>• **True and True** = True<br>
+      • **True and False** = False<br>
+      • **True or False** = True<br>
+      • **False or False** = False<br>
+      • **not True** = False<br>
+      • **not False** = True</p>
+    </div>
+
+    <p><strong>🎯 Practice Logical Operators!</strong></p>
+    <textarea id="logicCode1" placeholder="Write your logical operator code...">print("🎯 Smart Security System")
+print("=" * 30)
+
+# User credentials
+username = "admin"
+password = "secure123"
+is_admin = True
+failed_attempts = 0
+
+# Login attempt
+entered_user = "admin"
+entered_pass = "secure123"
+
+# Check credentials
+if entered_user == username and entered_pass == password:
+    print("✅ Login successful!")
+    
+    if is_admin:
+        print("🔑 Admin access granted")
+        print("Full system control available")
+    else:
+        print("👤 User access granted")
+        print("Limited access available")
+        
+elif entered_user == username or entered_pass == password:
+    print("⚠️ Partial credentials correct")
+    print("Please check your username and password")
+    
+else:
+    print("❌ Login failed!")
+    failed_attempts += 1
+    
+    if failed_attempts >= 3:
+        print("🚨 Account locked for security!")
+    else:
+        print(f"Attempts remaining: {3 - failed_attempts}")
+
+# System status check
+system_online = True
+maintenance_mode = False
+
+if system_online and not maintenance_mode:
+    print("\n🟢 System operational")
+else:
+    print("\n🔴 System unavailable")</textarea>
+    <br>
+    <button class="button" onclick="runLogicCode(1)">▶️ Run Code</button>
+    
+    <div id="logicOutput1" class="code-output hidden"></div>
+  </div>
+
+  <div id="logicLesson2" class="hidden">
+    <h3>🌐 Complex Conditional Chains</h3>
+    <p>Combine multiple logical operators and create sophisticated decision trees for real-world problem solving.</p>
+    
+    <div class="logic-examples">
+      <div class="logic-card">
+        <h4>🎯 Grade Calculator</h4>
+        <div class="code-editor">
+          def calculate_grade(score, attendance, participation):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;# Complex grading logic<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;if score >= 90 and attendance >= 95:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "A+"<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;elif score >= 85 and (attendance >= 90 or participation >= 80):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "A"<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;elif score >= 80 and attendance >= 85:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "B+"<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;elif score >= 75 or (attendance >= 95 and participation >= 85):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "B"<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;elif score >= 70 and not (attendance < 80 and participation < 60):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "C"<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;else:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "F"<br><br>
+          
+          # Test the function<br>
+          print(calculate_grade(88, 92, 85))  # A
+        </div>
+      </div>
+      
+      <div class="logic-card">
+        <h4>🌤️ Weather Advisory</h4>
+        <div class="code-editor">
+          def weather_advisory(temp, humidity, wind_speed, precipitation):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;advisories = []<br><br>
+          
+          &nbsp;&nbsp;&nbsp;&nbsp;# Temperature warnings<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;if temp > 100 or (temp > 95 and humidity > 60):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;advisories.append("🔥 Heat Warning")<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;elif temp < 32 and wind_speed > 15:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;advisories.append("🧊 Wind Chill Alert")<br><br>
+          
+          &nbsp;&nbsp;&nbsp;&nbsp;# Storm conditions<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;if wind_speed > 40 and precipitation > 0.5:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;advisories.append("⛈️ Severe Storm")<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;elif wind_speed > 25 or precipitation > 1.0:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;advisories.append("🌧️ Weather Advisory")<br><br>
+          
+          &nbsp;&nbsp;&nbsp;&nbsp;# Perfect conditions<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;if (70 <= temp <= 80 and humidity < 50 and <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wind_speed < 10 and precipitation == 0):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;advisories.append("☀️ Perfect Weather")<br><br>
+          
+          &nbsp;&nbsp;&nbsp;&nbsp;return advisories if advisories else ["🌤️ Normal Conditions"]
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <h3>⚡ Advanced Logic Tips</h3>
+      <p>• **Parentheses** control order of operations: (A and B) or C<br>
+      • **Short-circuit evaluation**: Python stops checking when result is determined<br>
+      • **Chained comparisons**: 18 <= age <= 65 is valid Python<br>
+      • **in operator**: "apple" in fruits is a logical operation</p>
+    </div>
+
+    <p><strong>🎯 Build Complex Logic Systems!</strong></p>
+    <textarea id="logicCode2" placeholder="Create complex conditional logic...">print("🏥 Medical Diagnosis Assistant")
+print("=" * 40)
+
+def medical_assessment(symptoms, age, temperature, blood_pressure):
+    """
+    Advanced medical assessment system using complex logic
+    """
+    diagnosis = []
+    urgency = "Low"
+    
+    # Critical conditions (immediate attention)
+    if (temperature > 103 or 
+        blood_pressure[0] > 180 or blood_pressure[1] > 120 or
+        ("chest_pain" in symptoms and "shortness_of_breath" in symptoms)):
+        urgency = "CRITICAL"
+        diagnosis.append("🚨 Seek immediate emergency care")
+    
+    # High priority conditions
+    elif (temperature > 101 and age > 65) or \
+         (blood_pressure[0] > 160 or blood_pressure[1] > 100) or \
+         ("severe_headache" in symptoms and "vision_changes" in symptoms):
+        urgency = "High"
+        diagnosis.append("⚠️ See doctor within 24 hours")
+    
+    # Specific symptom combinations
+    if "fever" in symptoms and "cough" in symptoms:
+        if "fatigue" in symptoms and temperature > 100:
+            diagnosis.append("🤒 Possible flu - rest and fluids")
+        elif "sore_throat" in symptoms:
+            diagnosis.append("🦠 Possible viral infection")
+    
+    if "headache" in symptoms and "nausea" in symptoms:
+        if temperature > 99 or "stiff_neck" in symptoms:
+            diagnosis.append("🧠 Monitor for serious conditions")
+        else:
+            diagnosis.append("💊 Possible tension headache")
+    
+    # Age-specific considerations
+    if age > 65 and ("fatigue" in symptoms or "confusion" in symptoms):
+        diagnosis.append("👴 Senior health monitoring recommended")
+    elif age < 18 and temperature > 102:
+        diagnosis.append("👶 Pediatric fever protocol")
+    
+    # Preventive care recommendations
+    if (not any(serious in symptoms for serious in 
+               ["chest_pain", "severe_headache", "shortness_of_breath"]) and
+        urgency == "Low"):
+        diagnosis.append("✅ Continue monitoring symptoms")
+        
+        if temperature < 99 and not symptoms:
+            diagnosis.append("🌟 No immediate concerns detected")
+    
+    return {
+        "urgency": urgency,
+        "recommendations": diagnosis,
+        "follow_up": urgency != "Low"
+    }
+
+# Test cases
+test_cases = [
+    {
+        "symptoms": ["fever", "cough", "fatigue"],
+        "age": 35,
+        "temperature": 101.5,
+        "blood_pressure": [120, 80]
+    },
+    {
+        "symptoms": ["chest_pain", "shortness_of_breath"],
+        "age": 55,
+        "temperature": 98.6,
+        "blood_pressure": [140, 90]
+    },
+    {
+        "symptoms": ["headache", "nausea"],
+        "age": 25,
+        "temperature": 99.2,
+        "blood_pressure": [110, 70]
+    }
+]
+
+for i, case in enumerate(test_cases, 1):
+    print(f"\n--- Patient {i} Assessment ---")
+    result = medical_assessment(**case)
+    print(f"Urgency Level: {result['urgency']}")
+    print("Recommendations:")
+    for rec in result['recommendations']:
+        print(f"  • {rec}")
+    if result['follow_up']:
+        print("📋 Follow-up care recommended")
+
+print("\n⚕️ Assessment complete!")
+print("Note: This is for educational purposes only.")</textarea>
+    <br>
+    <button class="button" onclick="runLogicCode(2)">▶️ Run Code</button>
+    
+    <div id="logicOutput2" class="code-output hidden"></div>
+  </div>
+
+  <div id="logicLesson3" class="hidden">
+    <h3>🏆 Challenge: Logic Puzzle Solver</h3>
+    <p><strong>Mission:</strong> Create a comprehensive logic puzzle solver!</p>
+    
+    <div class="tip-box">
+      <h3>🎯 Challenge Requirements</h3>
+      <p>Build a system that can solve logic puzzles using:</p>
+      <ul style="text-align: left;">
+        <li>Complex boolean expressions</li>
+        <li>Multiple constraint checking</li>
+        <li>Logical deduction algorithms</li>
+        <li>Truth table validation</li>
+        <li>Real-world problem solving</li>
+      </ul>
+    </div>
+
+    <textarea id="logicCode3" placeholder="Build your Logic Puzzle Solver here...">class LogicPuzzleSolver:
+    """
+    Advanced logic puzzle solver using boolean algebra and constraint satisfaction
+    """
+    
+    def __init__(self):
+        self.constraints = []
+        self.variables = {}
+        self.solutions = []
+    
+    def add_constraint(self, constraint_func, description):
+        """Add a logical constraint to the puzzle"""
+        self.constraints.append({
+            'function': constraint_func,
+            'description': description
+        })
+    
+    def solve_knights_and_knaves(self):
+        """
+        Solve the classic Knights and Knaves puzzle:
+        - Knights always tell the truth
+        - Knaves always lie
+        - A says "B is a knave"
+        - B says "A and I are of different types"
+        """
+        print("🏰 Knights and Knaves Puzzle")
+        print("=" * 35)
+        print("A says: 'B is a knave'")
+        print("B says: 'A and I are of different types'")
+        print()
+        
+        solutions = []
+        
+        # Try all possible combinations
+        for a_is_knight in [True, False]:
+            for b_is_knight in [True, False]:
+                
+                # A's statement: "B is a knave"
+                a_statement = not b_is_knight
+                
+                # B's statement: "A and I are of different types"
+                b_statement = a_is_knight != b_is_knight
+                
+                # Check consistency
+                a_consistent = (a_is_knight and a_statement) or (not a_is_knight and not a_statement)
+                b_consistent = (b_is_knight and b_statement) or (not b_is_knight and not b_statement)
+                
+                if a_consistent and b_consistent:
+                    solutions.append({
+                        'A': 'Knight' if a_is_knight else 'Knave',
+                        'B': 'Knight' if b_is_knight else 'Knave'
+                    })
+        
+        print("Solutions found:")
+        for i, solution in enumerate(solutions, 1):
+            print(f"  {i}. A is a {solution['A']}, B is a {solution['B']}")
+        
+        return solutions
+    
+    def solve_scheduling_puzzle(self):
+        """
+        Solve a complex scheduling puzzle with multiple constraints
+        """
+        print("\n📅 Meeting Scheduling Puzzle")
+        print("=" * 30)
+        print("Schedule 4 people (Alice, Bob, Carol, Dave) for meetings")
+        print("Constraints:")
+        print("- Alice can't meet on Monday or Friday")
+        print("- Bob needs Tuesday or Wednesday")
+        print("- Carol can't meet same day as Alice")
+        print("- Dave needs a day after Bob")
+        print("- Only one person per day")
+        print()
+        
+        people = ['Alice', 'Bob', 'Carol', 'Dave']
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+        
+        valid_schedules = []
+        
+        # Generate all possible assignments
+        from itertools import permutations
+        
+        for schedule in permutations(days[:4]):  # 4 people, 4 days
+            alice_day, bob_day, carol_day, dave_day = schedule
+            
+            # Check all constraints
+            constraints_met = True
+            
+            # Alice can't meet on Monday or Friday
+            if alice_day in ['Monday', 'Friday']:
+                constraints_met = False
+            
+            # Bob needs Tuesday or Wednesday
+            if bob_day not in ['Tuesday', 'Wednesday']:
+                constraints_met = False
+            
+            # Carol can't meet same day as Alice
+            if carol_day == alice_day:
+                constraints_met = False
+            
+            # Dave needs a day after Bob
+            bob_index = days.index(bob_day)
+            dave_index = days.index(dave_day)
+            if dave_index != bob_index + 1:
+                constraints_met = False
+            
+            if constraints_met:
+                valid_schedules.append({
+                    'Alice': alice_day,
+                    'Bob': bob_day,
+                    'Carol': carol_day,
+                    'Dave': dave_day
+                })
+        
+        print("Valid schedules:")
+        for i, schedule in enumerate(valid_schedules, 1):
+            print(f"  Solution {i}:")
+            for person, day in schedule.items():
+                print(f"    {person}: {day}")
+            print()
+        
+        return valid_schedules
+    
+    def solve_logic_grid(self):
+        """
+        Solve a logic grid puzzle using constraint satisfaction
+        """
+        print("🔍 Logic Grid Puzzle: Pet Owners")
+        print("=" * 35)
+        print("3 people (Ann, Ben, Cal) own different pets (Cat, Dog, Fish)")
+        print("and live in different colored houses (Red, Blue, Green)")
+        print()
+        print("Clues:")
+        print("1. Ann doesn't own the cat")
+        print("2. The person in the red house owns the dog")
+        print("3. Ben doesn't live in the blue house")
+        print("4. Cal doesn't own the fish")
+        print("5. The cat owner lives in the green house")
+        print()
+        
+        people = ['Ann', 'Ben', 'Cal']
+        pets = ['Cat', 'Dog', 'Fish']
+        houses = ['Red', 'Blue', 'Green']
+        
+        solutions = []
+        
+        from itertools import permutations
+        
+        for pet_assignment in permutations(pets):
+            for house_assignment in permutations(houses):
+                
+                # Create mapping
+                assignment = {}
+                for i, person in enumerate(people):
+                    assignment[person] = {
+                        'pet': pet_assignment[i],
+                        'house': house_assignment[i]
+                    }
+                
+                # Check constraints
+                valid = True
+                
+                # 1. Ann doesn't own the cat
+                if assignment['Ann']['pet'] == 'Cat':
+                    valid = False
+                
+                # 2. The person in the red house owns the dog
+                red_house_owner = None
+                for person, details in assignment.items():
+                    if details['house'] == 'Red':
+                        red_house_owner = person
+                        break
+                
+                if assignment[red_house_owner]['pet'] != 'Dog':
+                    valid = False
+                
+                # 3. Ben doesn't live in the blue house
+                if assignment['Ben']['house'] == 'Blue':
+                    valid = False
+                
+                # 4. Cal doesn't own the fish
+                if assignment['Cal']['pet'] == 'Fish':
+                    valid = False
+                
+                # 5. The cat owner lives in the green house
+                cat_owner = None
+                for person, details in assignment.items():
+                    if details['pet'] == 'Cat':
+                        cat_owner = person
+                        break
+                
+                if assignment[cat_owner]['house'] != 'Green':
+                    valid = False
+                
+                if valid:
+                    solutions.append(assignment)
+        
+        print("Solution:")
+        for solution in solutions:
+            for person, details in solution.items():
+                print(f"  {person}: {details['pet']} in {details['house']} house")
+        
+        return solutions
+    
+    def run_all_puzzles(self):
+        """Run all logic puzzles"""
+        print("🧩 Advanced Logic Puzzle Solver")
+        print("=" * 50)
+        print("Demonstrating complex boolean logic and constraint satisfaction")
+        print()
+        
+        # Solve all puzzles
+        knights_solutions = self.solve_knights_and_knaves()
+        schedule_solutions = self.solve_scheduling_puzzle()
+        grid_solutions = self.solve_logic_grid()
+        
+        print("🎉 All puzzles solved!")
+        print(f"Total solutions found: {len(knights_solutions) + len(schedule_solutions) + len(grid_solutions)}")
+        print()
+        print("This demonstrates:")
+        print("• Complex boolean logic evaluation")
+        print("• Constraint satisfaction algorithms")
+        print("• Systematic solution space exploration")
+        print("• Real-world problem modeling")
+
+# Create and run the puzzle solver
+solver = LogicPuzzleSolver()
+solver.run_all_puzzles()</textarea>
+    <br>
+    <button class="button" onclick="runLogicCode(3)">🚀 Run Puzzle Solver</button>
+    
+    <div id="logicOutput3" class="code-output hidden"></div>
+  </div>
+</div>
+
+<!-- Level 12: Game Development -->
+<div id="gameLevel" class="section hidden">
+  <h2>🎮 Game Development & Interactive Programming</h2>
+  
+  <div class="lesson-tabs">
+    <div class="lesson-tab active" onclick="showGameLesson(1)">🎲 Random & Events</div>
+    <div class="lesson-tab" onclick="showGameLesson(2)">🎯 Game Mechanics</div>
+    <div class="lesson-tab" onclick="showGameLesson(3)">🏆 Build Games</div>
+  </div>
+
+  <div id="gameLesson1" class="hidden">
+    <h3>🎲 Random Events & Game Logic</h3>
+    <p>Learn to create unpredictable and exciting game experiences using random events, probability, and dynamic gameplay elements.</p>
+    
+    <div class="game-examples">
+      <div class="game-card">
+        <h4>🎲 Random Number Generation</h4>
+        <div class="code-editor">
+          import random<br><br>
+          
+          # Basic random numbers<br>
+          dice_roll = random.randint(1, 6)<br>
+          print(f"Dice roll: {dice_roll}")<br><br>
+          
+          # Random choices<br>
+          weapons = ["sword", "bow", "staff", "dagger"]<br>
+          weapon = random.choice(weapons)<br>
+          print(f"You found a {weapon}!")<br><br>
+          
+          # Probability-based events<br>
+          if random.random() < 0.3:  # 30% chance<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("🎉 Critical hit!")<br>
+          else:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print("⚔️ Normal attack")
+        </div>
+      </div>
+      
+      <div class="game-card">
+        <h4>🎯 Game State Management</h4>
+        <div class="code-editor">
+          class GameState:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;def __init__(self):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.player_health = 100<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.player_score = 0<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.level = 1<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.inventory = []<br><br>
+          
+          &nbsp;&nbsp;&nbsp;&nbsp;def take_damage(self, damage):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.player_health -= damage<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if self.player_health <= 0:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "Game Over"<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "Continue"<br><br>
+          
+          &nbsp;&nbsp;&nbsp;&nbsp;def add_score(self, points):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.player_score += points<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if self.player_score >= self.level * 1000:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.level += 1<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "Level Up!"
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <h3>🎮 Game Design Principles</h3>
+      <p>• **Randomness** creates replayability and excitement<br>
+      • **State management** tracks player progress<br>
+      • **Feedback loops** reward player actions<br>
+      • **Progressive difficulty** keeps players engaged</p>
+    </div>
+
+    <p><strong>🎯 Create Random Game Events!</strong></p>
+    <textarea id="gameCode1" placeholder="Build random game systems...">import random
+
+class AdventureGame:
+    def __init__(self):
+        self.player = {
+            'name': 'Hero',
+            'health': 100,
+            'max_health': 100,
+            'gold': 50,
+            'experience': 0,
+            'level': 1,
+            'inventory': ['Basic Sword', 'Health Potion']
+        }
+        
+        self.events = [
+            'treasure', 'monster', 'merchant', 'trap', 'shrine', 'mystery'
+        ]
+        
+        self.monsters = [
+            {'name': 'Goblin', 'health': 30, 'damage': 15, 'gold': 20, 'exp': 25},
+            {'name': 'Orc', 'health': 50, 'damage': 25, 'gold': 35, 'exp': 40},
+            {'name': 'Dragon', 'health': 100, 'damage': 40, 'gold': 100, 'exp': 80}
+        ]
+        
+        self.treasures = [
+            {'name': 'Gold Coins', 'gold': 30},
+            {'name': 'Magic Ring', 'gold': 50},
+            {'name': 'Ancient Artifact', 'gold': 75}
+        ]
+    
+    def random_event(self):
+        """Generate a random adventure event"""
+        event = random.choice(self.events)
+        
+        print(f"\n🎲 Random Event: {event.title()}")
+        print("-" * 30)
+        
+        if event == 'treasure':
+            self.treasure_event()
+        elif event == 'monster':
+            self.monster_event()
+        elif event == 'merchant':
+            self.merchant_event()
+        elif event == 'trap':
+            self.trap_event()
+        elif event == 'shrine':
+            self.shrine_event()
+        elif event == 'mystery':
+            self.mystery_event()
+    
+    def treasure_event(self):
+        """Player finds treasure"""
+        treasure = random.choice(self.treasures)
+        self.player['gold'] += treasure['gold']
+        
+        print(f"💰 You found {treasure['name']}!")
+        print(f"Gained {treasure['gold']} gold")
+        print(f"Total gold: {self.player['gold']}")
+    
+    def monster_event(self):
+        """Player encounters a monster"""
+        monster = random.choice(self.monsters)
+        print(f"👹 A wild {monster['name']} appears!")
+        
+        # Simple combat simulation
+        player_damage = random.randint(20, 35)
+        monster_health = monster['health']
+        
+        print(f"⚔️ You attack for {player_damage} damage!")
+        monster_health -= player_damage
+        
+        if monster_health <= 0:
+            print(f"🏆 You defeated the {monster['name']}!")
+            self.player['gold'] += monster['gold']
+            self.player['experience'] += monster['exp']
+            print(f"Gained {monster['gold']} gold and {monster['exp']} experience")
+        else:
+            print(f"💥 The {monster['name']} attacks back!")
+            self.player['health'] -= monster['damage']
+            print(f"You take {monster['damage']} damage")
+            print(f"Health: {self.player['health']}/{self.player['max_health']}")
+    
+    def merchant_event(self):
+        """Player meets a merchant"""
+        items = ['Health Potion', 'Magic Sword', 'Shield', 'Lucky Charm']
+        prices = [25, 75, 50, 40]
+        
+        item = random.choice(items)
+        price = random.choice(prices)
+        
+        print(f"🏪 Merchant offers {item} for {price} gold")
+        
+        if self.player['gold'] >= price:
+            if random.choice([True, False]):  # 50% chance to buy
+                self.player['gold'] -= price
+                self.player['inventory'].append(item)
+                print(f"✅ Purchased {item}!")
+            else:
+                print("🚫 You decide not to buy")
+        else:
+            print("💸 Not enough gold!")
+    
+    def trap_event(self):
+        """Player encounters a trap"""
+        trap_types = ['Spike Pit', 'Poison Dart', 'Falling Boulder', 'Magic Curse']
+        trap = random.choice(trap_types)
+        
+        print(f"🕳️ You triggered a {trap}!")
+        
+        # Chance to avoid trap
+        if random.random() < 0.4:  # 40% chance to avoid
+            print("🤸 You skillfully avoided the trap!")
+        else:
+            damage = random.randint(10, 25)
+            self.player['health'] -= damage
+            print(f"💥 You take {damage} damage!")
+            print(f"Health: {self.player['health']}/{self.player['max_health']}")
+    
+    def shrine_event(self):
+        """Player finds a healing shrine"""
+        heal_amount = random.randint(20, 40)
+        self.player['health'] = min(self.player['max_health'], 
+                                   self.player['health'] + heal_amount)
+        
+        print(f"⛩️ You found a healing shrine!")
+        print(f"Restored {heal_amount} health")
+        print(f"Health: {self.player['health']}/{self.player['max_health']}")
+    
+    def mystery_event(self):
+        """Random mystery event with multiple outcomes"""
+        mysteries = [
+            "You find a glowing orb...",
+            "A mysterious stranger approaches...",
+            "You discover an ancient rune...",
+            "A magical portal appears..."
+        ]
+        
+        mystery = random.choice(mysteries)
+        print(f"❓ {mystery}")
+        
+        # Random outcome
+        outcome = random.randint(1, 4)
+        
+        if outcome == 1:
+            bonus_gold = random.randint(40, 80)
+            self.player['gold'] += bonus_gold
+            print(f"✨ Magic grants you {bonus_gold} gold!")
+        elif outcome == 2:
+            bonus_exp = random.randint(30, 60)
+            self.player['experience'] += bonus_exp
+            print(f"🧠 You gain {bonus_exp} experience from wisdom!")
+        elif outcome == 3:
+            print("🔮 The magic fizzles out harmlessly")
+        else:
+            curse_damage = random.randint(5, 15)
+            self.player['health'] -= curse_damage
+            print(f"😈 Dark magic drains {curse_damage} health!")
+    
+    def display_status(self):
+        """Display player status"""
+        print(f"\n📊 {self.player['name']} Status:")
+        print(f"❤️ Health: {self.player['health']}/{self.player['max_health']}")
+        print(f"💰 Gold: {self.player['gold']}")
+        print(f"⭐ Experience: {self.player['experience']}")
+        print(f"🎯 Level: {self.player['level']}")
+        print(f"🎒 Inventory: {', '.join(self.player['inventory'])}")
+    
+    def play_adventure(self, num_events=5):
+        """Play through a series of random events"""
+        print("🗡️ Welcome to the Random Adventure Game!")
+        print("=" * 45)
+        
+        self.display_status()
+        
+        for i in range(num_events):
+            if self.player['health'] <= 0:
+                print("\n💀 Game Over! Your adventure ends here.")
+                break
+                
+            print(f"\n--- Adventure Event {i+1} ---")
+            self.random_event()
+            
+            # Level up check
+            if self.player['experience'] >= self.player['level'] * 100:
+                self.player['level'] += 1
+                self.player['max_health'] += 20
+                self.player['health'] = self.player['max_health']
+                print(f"\n🎉 LEVEL UP! You are now level {self.player['level']}!")
+                print(f"Max health increased to {self.player['max_health']}")
+        
+        if self.player['health'] > 0:
+            print(f"\n🏁 Adventure Complete!")
+            self.display_status()
+            print(f"\nFinal Score: {self.player['gold'] + self.player['experience']}")
+
+# Create and play the game
+game = AdventureGame()
+game.play_adventure(6)</textarea>
+    <br>
+    <button class="button" onclick="runGameCode(1)">▶️ Run Code</button>
+    
+    <div id="gameOutput1" class="code-output hidden"></div>
+  </div>
+
+  <div id="gameLesson2" class="hidden">
+    <h3>🎯 Game Mechanics & Player Interaction</h3>
+    <p>Design engaging game mechanics that respond to player choices and create compelling interactive experiences.</p>
+    
+    <div class="game-examples">
+      <div class="game-card">
+        <h4>🎮 Input Handling</h4>
+        <div class="code-editor">
+          def get_player_choice(options):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"""Get valid player input"""<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;while True:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("\\nChoose an action:")<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for i, option in enumerate(options, 1):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(f"{i}. {option}")<br><br>
+          
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;try:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;choice = int(input("Enter choice: "))<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if 1 <= choice <= len(options):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return choice - 1<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Invalid choice!")<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;except ValueError:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Please enter a number!")
+        </div>
+      </div>
+      
+      <div class="game-card">
+        <h4>🏆 Scoring Systems</h4>
+        <div class="code-editor">
+          class ScoreManager:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;def __init__(self):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.score = 0<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.multiplier = 1<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.combo = 0<br><br>
+          
+          &nbsp;&nbsp;&nbsp;&nbsp;def add_points(self, base_points, bonus=False):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if bonus:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.combo += 1<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.multiplier = min(5, 1 + self.combo * 0.5)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.combo = 0<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.multiplier = 1<br><br>
+          
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;points = int(base_points * self.multiplier)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.score += points<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return points
+        </div>
+      </div>
+    </div>
+
+    <p><strong>🎯 Build Interactive Game Mechanics!</strong></p>
+    <textarea id="gameCode2" placeholder="Create interactive game systems...">import random
+
+class InteractiveRPG:
+    def __init__(self):
+        self.player = {
+            'name': 'Adventurer',
+            'health': 100,
+            'max_health': 100,
+            'mana': 50,
+            'max_mana': 50,
+            'attack': 25,
+            'defense': 10,
+            'gold': 100,
+            'level': 1,
+            'experience': 0,
+            'skills': ['Basic Attack', 'Heal']
+        }
+        
+        self.current_enemy = None
+        self.game_state = 'exploring'  # exploring, combat, shop, game_over
+    
+    def create_enemy(self, level_modifier=0):
+        """Create a random enemy based on player level"""
+        enemy_types = [
+            {'name': 'Goblin Scout', 'health': 40, 'attack': 15, 'defense': 5, 'exp': 20, 'gold': 15},
+            {'name': 'Orc Warrior', 'health': 60, 'attack': 20, 'defense': 8, 'exp': 35, 'gold': 25},
+            {'name': 'Dark Mage', 'health': 45, 'attack': 25, 'defense': 3, 'exp': 40, 'gold': 30},
+            {'name': 'Stone Golem', 'health': 80, 'attack': 18, 'defense': 15, 'exp': 50, 'gold': 20},
+            {'name': 'Shadow Beast', 'health': 55, 'attack': 22, 'defense': 7, 'exp': 45, 'gold': 35}
+        ]
+        
+        base_enemy = random.choice(enemy_types).copy()
+        
+        # Scale enemy to player level
+        level_bonus = (self.player['level'] - 1 + level_modifier) * 0.3
+        base_enemy['health'] = int(base_enemy['health'] * (1 + level_bonus))
+        base_enemy['attack'] = int(base_enemy['attack'] * (1 + level_bonus))
+        base_enemy['defense'] = int(base_enemy['defense'] * (1 + level_bonus))
+        base_enemy['exp'] = int(base_enemy['exp'] * (1 + level_bonus))
+        base_enemy['gold'] = int(base_enemy['gold'] * (1 + level_bonus))
+        
+        base_enemy['max_health'] = base_enemy['health']
+        return base_enemy
+    
+    def display_status(self):
+        """Display player and enemy status"""
+        print(f"\n{'='*50}")
+        print(f"🧙 {self.player['name']} (Level {self.player['level']})")
+        print(f"❤️ Health: {self.player['health']}/{self.player['max_health']}")
+        print(f"💙 Mana: {self.player['mana']}/{self.player['max_mana']}")
+        print(f"⚔️ Attack: {self.player['attack']} | 🛡️ Defense: {self.player['defense']}")
+        print(f"💰 Gold: {self.player['gold']} | ⭐ EXP: {self.player['experience']}")
+        
+        if self.current_enemy and self.game_state == 'combat':
+            print(f"\n👹 {self.current_enemy['name']}")
+            print(f"❤️ Health: {self.current_enemy['health']}/{self.current_enemy['max_health']}")
+            print(f"⚔️ Attack: {self.current_enemy['attack']} | 🛡️ Defense: {self.current_enemy['defense']}")
+        
+        print(f"{'='*50}")
+    
+    def combat_turn(self):
+        """Handle one turn of combat"""
+        print(f"\n⚔️ Combat with {self.current_enemy['name']}!")
+        
+        # Player action menu
+        actions = [
+            "🗡️ Attack",
+            "🛡️ Defend",
+            "💙 Use Mana (Heal)",
+            "🏃 Try to Flee"
+        ]
+        
+        if 'Fireball' in self.player['skills']:
+            actions.insert(1, "🔥 Fireball (10 mana)")
+        
+        print("\nChoose your action:")
+        for i, action in enumerate(actions, 1):
+            print(f"{i}. {action}")
+        
+        try:
+            choice = int(input("Enter choice (1-{}): ".format(len(actions)))) - 1
+            
+            if choice == 0:  # Attack
+                self.player_attack()
+            elif choice == 1 and 'Fireball' in self.player['skills']:  # Fireball
+                self.player_fireball()
+            elif (choice == 1 and 'Fireball' not in self.player['skills']) or \
+                 (choice == 2 and 'Fireball' in self.player['skills']):  # Defend
+                self.player_defend()
+            elif (choice == 2 and 'Fireball' not in self.player['skills']) or \
+                 (choice == 3 and 'Fireball' in self.player['skills']):  # Heal
+                self.player_heal()
+            elif choice == len(actions) - 1:  # Flee
+                if self.player_flee():
+                    return
+            else:
+                print("❌ Invalid choice!")
+                return self.combat_turn()
+                
+        except ValueError:
+            print("❌ Please enter a valid number!")
+            return self.combat_turn()
+        
+        # Check if enemy is defeated
+        if self.current_enemy['health'] <= 0:
+            self.victory()
+            return
+        
+        # Enemy turn
+        self.enemy_attack()
+        
+        # Check if player is defeated
+        if self.player['health'] <= 0:
+            self.game_over()
+    
+    def player_attack(self):
+        """Player performs basic attack"""
+        damage = max(1, self.player['attack'] - self.current_enemy['defense'])
+        critical = random.random() < 0.15  # 15% crit chance
+        
+        if critical:
+            damage *= 2
+            print(f"💥 CRITICAL HIT! You deal {damage} damage!")
+        else:
+            print(f"⚔️ You attack for {damage} damage!")
+        
+        self.current_enemy['health'] -= damage
+        self.current_enemy['health'] = max(0, self.current_enemy['health'])
+    
+    def player_fireball(self):
+        """Player casts fireball spell"""
+        if self.player['mana'] < 10:
+            print("💙 Not enough mana!")
+            return self.combat_turn()
+        
+        self.player['mana'] -= 10
+        damage = random.randint(30, 45)
+        print(f"🔥 You cast Fireball for {damage} damage!")
+        
+        self.current_enemy['health'] -= damage
+        self.current_enemy['health'] = max(0, self.current_enemy['health'])
+    
+    def player_defend(self):
+        """Player defends, reducing incoming damage"""
+        self.player['defending'] = True
+        heal_amount = random.randint(5, 10)
+        self.player['health'] = min(self.player['max_health'], 
+                                   self.player['health'] + heal_amount)
+        print(f"🛡️ You defend and recover {heal_amount} health!")
+    
+    def player_heal(self):
+        """Player uses mana to heal"""
+        if self.player['mana'] < 15:
+            print("💙 Not enough mana!")
+            return self.combat_turn()
+        
+        self.player['mana'] -= 15
+        heal_amount = random.randint(25, 40)
+        self.player['health'] = min(self.player['max_health'], 
+                                   self.player['health'] + heal_amount)
+        print(f"💚 You heal for {heal_amount} health!")
+    
+    def player_flee(self):
+        """Player attempts to flee from combat"""
+        if random.random() < 0.6:  # 60% success rate
+            print("🏃 You successfully flee from combat!")
+            self.game_state = 'exploring'
+            self.current_enemy = None
+            return True
+        else:
+            print("🚫 You couldn't escape!")
+            return False
+    
+    def enemy_attack(self):
+        """Enemy attacks the player"""
+        damage = max(1, self.current_enemy['attack'] - self.player['defense'])
+        
+        # Reduce damage if player defended
+        if hasattr(self.player, 'defending') and self.player['defending']:
+            damage = max(1, damage // 2)
+            print(f"🛡️ Your defense reduces the damage!")
+            delattr(self.player, 'defending')
+        
+        print(f"👹 {self.current_enemy['name']} attacks for {damage} damage!")
+        self.player['health'] -= damage
+        self.player['health'] = max(0, self.player['health'])
+    
+    def victory(self):
+        """Handle victory over enemy"""
+        exp_gained = self.current_enemy['exp']
+        gold_gained = self.current_enemy['gold']
+        
+        print(f"\n🏆 Victory! You defeated the {self.current_enemy['name']}!")
+        print(f"⭐ Gained {exp_gained} experience")
+        print(f"💰 Gained {gold_gained} gold")
+        
+        self.player['experience'] += exp_gained
+        self.player['gold'] += gold_gained
+        
+        # Check for level up
+        exp_needed = self.player['level'] * 100
+        if self.player['experience'] >= exp_needed:
+            self.level_up()
+        
+        # Restore some mana
+        mana_restore = random.randint(5, 15)
+        self.player['mana'] = min(self.player['max_mana'], 
+                                 self.player['mana'] + mana_restore)
+        print(f"💙 Restored {mana_restore} mana")
+        
+        self.game_state = 'exploring'
+        self.current_enemy = None
+    
+    def level_up(self):
+        """Handle player level up"""
+        self.player['level'] += 1
+        self.player['experience'] = 0
+        
+        # Increase stats
+        health_increase = random.randint(15, 25)
+        mana_increase = random.randint(8, 12)
+        attack_increase = random.randint(3, 7)
+        defense_increase = random.randint(2, 5)
+        
+        self.player['max_health'] += health_increase
+        self.player['health'] = self.player['max_health']  # Full heal on level up
+        self.player['max_mana'] += mana_increase
+        self.player['mana'] = self.player['max_mana']
+        self.player['attack'] += attack_increase
+        self.player['defense'] += defense_increase
+        
+        print(f"\n🎉 LEVEL UP! You are now level {self.player['level']}!")
+        print(f"📈 Health: +{health_increase} (now {self.player['max_health']})")
+        print(f"📈 Mana: +{mana_increase} (now {self.player['max_mana']})")
+        print(f"📈 Attack: +{attack_increase} (now {self.player['attack']})")
+        print(f"📈 Defense: +{defense_increase} (now {self.player['defense']})")
+        
+        # Learn new skills
+        if self.player['level'] == 3 and 'Fireball' not in self.player['skills']:
+            self.player['skills'].append('Fireball')
+            print("🔥 Learned new skill: Fireball!")
+    
+    def game_over(self):
+        """Handle game over"""
+        print(f"\n💀 GAME OVER!")
+        print(f"Your adventure ends at level {self.player['level']}")
+        print(f"Final score: {self.player['gold'] + self.player['experience'] * 10}")
+        self.game_state = 'game_over'
+    
+    def explore(self):
+        """Handle exploration phase"""
+        events = ['combat', 'treasure', 'rest', 'merchant']
+        event = random.choice(events)
+        
+        if event == 'combat':
+            self.current_enemy = self.create_enemy()
+            self.game_state = 'combat'
+            print(f"\n⚔️ A {self.current_enemy['name']} blocks your path!")
+        
+        elif event == 'treasure':
+            gold_found = random.randint(20, 50)
+            self.player['gold'] += gold_found
+            print(f"\n💰 You found a treasure chest with {gold_found} gold!")
+        
+        elif event == 'rest':
+            health_restored = random.randint(15, 30)
+            mana_restored = random.randint(10, 20)
+            self.player['health'] = min(self.player['max_health'], 
+                                       self.player['health'] + health_restored)
+            self.player['mana'] = min(self.player['max_mana'], 
+                                     self.player['mana'] + mana_restored)
+            print(f"\n🏕️ You rest at a safe camp")
+            print(f"Restored {health_restored} health and {mana_restored} mana")
+        
+        elif event == 'merchant':
+            print(f"\n🏪 You meet a traveling merchant")
+            print("Items available:")
+            print("1. Health Potion (30 gold) - Restore 50 health")
+            print("2. Mana Potion (25 gold) - Restore 30 mana")
+            print("3. Attack Boost (100 gold) - Permanently +5 attack")
+            print("4. Leave")
+            
+            try:
+                choice = int(input("What would you like to buy? "))
+                if choice == 1 and self.player['gold'] >= 30:
+                    self.player['gold'] -= 30
+                    self.player['health'] = min(self.player['max_health'], 
+                                               self.player['health'] + 50)
+                    print("💚 Used Health Potion!")
+                elif choice == 2 and self.player['gold'] >= 25:
+                    self.player['gold'] -= 25
+                    self.player['mana'] = min(self.player['max_mana'], 
+                                             self.player['mana'] + 30)
+                    print("💙 Used Mana Potion!")
+                elif choice == 3 and self.player['gold'] >= 100:
+                    self.player['gold'] -= 100
+                    self.player['attack'] += 5
+                    print("⚔️ Attack permanently increased!")
+                elif choice == 4:
+                    print("👋 You leave the merchant")
+                else:
+                    print("💸 Not enough gold or invalid choice!")
+            except ValueError:
+                print("❌ Invalid input!")
+    
+    def play_game(self):
+        """Main game loop"""
+        print("🗡️ Welcome to Interactive RPG Adventure!")
+        print("=" * 50)
+        
+        name = input("Enter your character name: ").strip()
+        if name:
+            self.player['name'] = name
+        
+        print(f"\nWelcome, {self.player['name']}! Your adventure begins...")
+        
+        turn_count = 0
+        while self.game_state != 'game_over' and turn_count < 20:
+            self.display_status()
+            
+            if self.game_state == 'exploring':
+                input("\nPress Enter to continue exploring...")
+                self.explore()
+            elif self.game_state == 'combat':
+                self.combat_turn()
+            
+            turn_count += 1
+        
+        if self.game_state != 'game_over':
+            print(f"\n🎉 Congratulations! You survived 20 turns of adventure!")
+            print(f"Final level: {self.player['level']}")
+            print(f"Final score: {self.player['gold'] + self.player['experience'] * 10}")
+
+# Create and play the game
+game = InteractiveRPG()
+game.play_game()</textarea>
+    <br>
+    <button class="button" onclick="runGameCode(2)">▶️ Run Code</button>
+    
+    <div id="gameOutput2" class="code-output hidden"></div>
+  </div>
+
+  <div id="gameLesson3" class="hidden">
+    <h3>🏆 Final Challenge: Complete Game Development</h3>
+    <p><strong>Mission:</strong> Build a complete, playable game from scratch!</p>
+    
+    <div class="tip-box">
+      <h3>🎯 Game Development Challenge</h3>
+      <p>Create a comprehensive game that includes:</p>
+      <ul style="text-align: left;">
+        <li>Multiple game mechanics and systems</li>
+        <li>Player progression and scoring</li>
+        <li>Random events and replayability</li>
+        <li>Interactive user interface</li>
+        <li>Win/lose conditions</li>
+        <li>Save/load functionality (simulated)</li>
+      </ul>
+    </div>
+
+    <div class="interactive-game">
+      <h4>🎮 Play: Rock Paper Scissors Tournament</h4>
+      <p>Best of 5 rounds against the computer!</p>
+      <div id="rpsGame">
+        <div id="rpsScore">Player: 0 | Computer: 0</div>
+        <div id="rpsRound">Round 1 of 5</div>
+        <div style="margin: 20px 0;">
+          <button class="game-button" onclick="playRPS('rock')">🪨 Rock</button>
+          <button class="game-button" onclick="playRPS('paper')">📄 Paper</button>
+          <button class="game-button" onclick="playRPS('scissors')">✂️ Scissors</button>
+        </div>
+        <div id="rpsResult">Choose your move!</div>
+        <button class="game-button" onclick="resetRPS()" style="background: linear-gradient(45deg, #666, #888); margin-top: 15px;">🔄 New Game</button>
+      </div>
+    </div>
+
+    <textarea id="gameCode3" placeholder="Build your complete game here...">import random
+import json
+from datetime import datetime
+
+class GameEngine:
+    """
+    Complete game engine with multiple game modes and features
+    """
+    
+    def __init__(self):
+        self.games = {
+            'quiz': QuizGame(),
+            'adventure': TextAdventure(),
+            'puzzle': NumberPuzzle(),
+            'memory': MemoryGame()
+        }
+        
+        self.player_profile = {
+            'name': 'Player',
+            'total_score': 0,
+            'games_played': 0,
+            'achievements': [],
+            'favorite_game': None,
+            'play_time': 0
+        }
+        
+        self.session_start = datetime.now()
+    
+    def display_main_menu(self):
+        """Display the main game menu"""
+        print("🎮 ULTIMATE GAME COLLECTION")
+        print("=" * 50)
+        print(f"Welcome back, {self.player_profile['name']}!")
+        print(f"Total Score: {self.player_profile['total_score']}")
+        print(f"Games Played: {self.player_profile['games_played']}")
+        print()
+        
+        print("Available Games:")
+        print("1. 🧠 Quiz Master - Test your knowledge")
+        print("2. 🗡️ Text Adventure - Epic story journey")
+        print("3. 🔢 Number Puzzle - Logic and math")
+        print("4. 🧩 Memory Game - Remember the sequence")
+        print("5. 📊 View Statistics")
+        print("6. 🏆 Achievements")
+        print("7. 💾 Save & Exit")
+        print()
+    
+    def play_session(self):
+        """Main game session loop"""
+        print("🎮 Welcome to the Ultimate Game Collection!")
+        
+        name = input("Enter your player name: ").strip()
+        if name:
+            self.player_profile['name'] = name
+        
+        while True:
+            self.display_main_menu()
+            
+            try:
+                choice = int(input("Choose an option (1-7): "))
+                
+                if choice == 1:
+                    self.play_game('quiz')
+                elif choice == 2:
+                    self.play_game('adventure')
+                elif choice == 3:
+                    self.play_game('puzzle')
+                elif choice == 4:
+                    self.play_game('memory')
+                elif choice == 5:
+                    self.show_statistics()
+                elif choice == 6:
+                    self.show_achievements()
+                elif choice == 7:
+                    self.save_and_exit()
+                    break
+                else:
+                    print("❌ Invalid choice! Please choose 1-7.")
+                    
+            except ValueError:
+                print("❌ Please enter a valid number!")
+            
+            input("\nPress Enter to continue...")
+    
+    def play_game(self, game_type):
+        """Play a specific game"""
+        game = self.games[game_type]
+        print(f"\n🎯 Starting {game.name}...")
+        
+        score = game.play()
+        
+        # Update player profile
+        self.player_profile['total_score'] += score
+        self.player_profile['games_played'] += 1
+        
+        # Check for achievements
+        self.check_achievements(game_type, score)
+        
+        print(f"\n🎉 Game completed! Score: {score}")
+        print(f"Total Score: {self.player_profile['total_score']}")
+    
+    def check_achievements(self, game_type, score):
+        """Check and award achievements"""
+        achievements = []
+        
+        # Score-based achievements
+        if score >= 100 and "High Scorer" not in self.player_profile['achievements']:
+            achievements.append("High Scorer")
+        
+        if score >= 200 and "Score Master" not in self.player_profile['achievements']:
+            achievements.append("Score Master")
+        
+        # Game-specific achievements
+        if game_type == 'quiz' and score >= 80:
+            if "Quiz Champion" not in self.player_profile['achievements']:
+                achievements.append("Quiz Champion")
+        
+        # Play count achievements
+        if self.player_profile['games_played'] >= 5:
+            if "Dedicated Player" not in self.player_profile['achievements']:
+                achievements.append("Dedicated Player")
+        
+        if self.player_profile['games_played'] >= 10:
+            if "Game Master" not in self.player_profile['achievements']:
+                achievements.append("Game Master")
+        
+        # Award new achievements
+        for achievement in achievements:
+            if achievement not in self.player_profile['achievements']:
+                self.player_profile['achievements'].append(achievement)
+                print(f"\n🏆 ACHIEVEMENT UNLOCKED: {achievement}!")
+    
+    def show_statistics(self):
+        """Display player statistics"""
+        print("\n📊 PLAYER STATISTICS")
+        print("=" * 30)
+        print(f"Name: {self.player_profile['name']}")
+        print(f"Total Score: {self.player_profile['total_score']}")
+        print(f"Games Played: {self.player_profile['games_played']}")
+        
+        if self.player_profile['games_played'] > 0:
+            avg_score = self.player_profile['total_score'] / self.player_profile['games_played']
+            print(f"Average Score: {avg_score:.1f}")
+        
+        session_time = (datetime.now() - self.session_start).seconds // 60
+        print(f"Session Time: {session_time} minutes")
+        print(f"Achievements: {len(self.player_profile['achievements'])}")
+    
+    def show_achievements(self):
+        """Display player achievements"""
+        print("\n🏆 ACHIEVEMENTS")
+        print("=" * 20)
+        
+        if self.player_profile['achievements']:
+            for achievement in self.player_profile['achievements']:
+                print(f"✅ {achievement}")
+        else:
+            print("No achievements yet. Keep playing to unlock them!")
+        
+        print(f"\nTotal: {len(self.player_profile['achievements'])} achievements")
+    
+    def save_and_exit(self):
+        """Save game data and exit"""
+        print("\n💾 Saving game data...")
+        
+        # Simulate saving to file
+        save_data = {
+            'player_profile': self.player_profile,
+            'session_time': (datetime.now() - self.session_start).seconds,
+            'save_date': datetime.now().isoformat()
+        }
+        
+        print("✅ Game saved successfully!")
+        print(f"Thanks for playing, {self.player_profile['name']}!")
+        print(f"Final Score: {self.player_profile['total_score']}")
+        print(f"Games Played: {self.player_profile['games_played']}")
+
+
+class QuizGame:
+    """Knowledge quiz game"""
+    
+    def __init__(self):
+        self.name = "Quiz Master"
+        self.questions = [
+            {
+                'question': 'What is the capital of France?',
+                'options': ['London', 'Berlin', 'Paris', 'Madrid'],
+                'correct': 2,
+                'points': 10
+            },
+            {
+                'question': 'Which planet is closest to the Sun?',
+                'options': ['Venus', 'Mercury', 'Earth', 'Mars'],
+                'correct': 1,
+                'points': 10
+            },
+            {
+                'question': 'What is 15 × 8?',
+                'options': ['120', '125', '115', '130'],
+                'correct': 0,
+                'points': 15
+            },
+            {
+                'question': 'Who wrote "Romeo and Juliet"?',
+                'options': ['Charles Dickens', 'William Shakespeare', 'Jane Austen', 'Mark Twain'],
+                'correct': 1,
+                'points': 10
+            },
+            {
+                'question': 'What is the largest ocean on Earth?',
+                'options': ['Atlantic', 'Indian', 'Arctic', 'Pacific'],
+                'correct': 3,
+                'points': 10
+            }
+        ]
+    
+    def play(self):
+        """Play the quiz game"""
+        print(f"\n🧠 Welcome to {self.name}!")
+        print("Answer questions to earn points!")
+        print()
+        
+        score = 0
+        correct_answers = 0
+        
+        for i, q in enumerate(self.questions, 1):
+            print(f"Question {i}: {q['question']}")
+            
+            for j, option in enumerate(q['options']):
+                print(f"  {j+1}. {option}")
+            
+            try:
+                answer = int(input("Your answer (1-4): ")) - 1
+                
+                if answer == q['correct']:
+                    print("✅ Correct!")
+                    score += q['points']
+                    correct_answers += 1
+                else:
+                    print(f"❌ Wrong! The correct answer was: {q['options'][q['correct']]}")
+                
+                print(f"Score: {score}")
+                print()
+                
+            except ValueError:
+                print("❌ Invalid input! Skipping question.")
+                print()
+        
+        # Bonus for perfect score
+        if correct_answers == len(self.questions):
+            bonus = 50
+            score += bonus
+            print(f"🎉 PERFECT SCORE! Bonus: +{bonus} points!")
+        
+        print(f"Quiz completed! Final score: {score}")
+        print(f"Correct answers: {correct_answers}/{len(self.questions)}")
+        
+        return score
+
+
+class TextAdventure:
+    """Simple text adventure game"""
+    
+    def __init__(self):
+        self.name = "Text Adventure"
+        self.player_health = 100
+        self.player_gold = 0
+        self.current_room = 'start'
+    
+    def play(self):
+        """Play the text adventure"""
+        print(f"\n🗡️ Welcome to {self.name}!")
+        print("Navigate through rooms and make choices!")
+        print()
+        
+        score = 0
+        
+        while self.player_health > 0 and self.current_room != 'end':
+            if self.current_room == 'start':
+                score += self.room_start()
+            elif self.current_room == 'forest':
+                score += self.room_forest()
+            elif self.current_room == 'cave':
+                score += self.room_cave()
+            elif self.current_room == 'treasure':
+                score += self.room_treasure()
+        
+        if self.player_health <= 0:
+            print("💀 Game Over! You have fallen in your adventure.")
+            score = max(0, score - 20)  # Penalty for dying
+        else:
+            print("🎉 Adventure completed successfully!")
+            score += 30  # Completion bonus
+        
+        return score
+    
+    def room_start(self):
+        """Starting room"""
+        print("🏠 You stand at the entrance of a mysterious forest.")
+        print("Two paths lie before you:")
+        print("1. Enter the dark forest")
+        print("2. Explore the nearby cave")
+        
+        choice = input("Choose your path (1-2): ")
+        
+        if choice == '1':
+            self.current_room = 'forest'
+            print("🌲 You venture into the forest...")
+        elif choice == '2':
+            self.current_room = 'cave'
+            print("🕳️ You approach the mysterious cave...")
+        else:
+            print("❌ Invalid choice! You hesitate and lose time.")
+            return -5
+        
+        return 10
+    
+    def room_forest(self):
+        """Forest room"""
+        print("🌲 Deep in the forest, you encounter a wild wolf!")
+        print("1. Fight the wolf")
+        print("2. Try to sneak past")
+        print("3. Offer food to befriend it")
+        
+        choice = input("What do you do? (1-3): ")
+        
+        if choice == '1':
+            if random.random() < 0.6:  # 60% chance to win
+                print("⚔️ You defeat the wolf! You find 20 gold.")
+                self.player_gold += 20
+                self.current_room = 'treasure'
+                return 25
+            else:
+                print("💥 The wolf injures you!")
+                self.player_health -= 30
+                self.current_room = 'treasure'
+                return 10
+        elif choice == '2':
+            if random.random() < 0.7:  # 70% chance to succeed
+                print("🤫 You successfully sneak past the wolf!")
+                self.current_room = 'treasure'
+                return 20
+            else:
+                print("👀 The wolf spots you and attacks!")
+                self.player_health -= 20
+                self.current_room = 'treasure'
+                return 5
+        elif choice == '3':
+            print("🐺 The wolf becomes your friend and guides you to treasure!")
+            self.player_gold += 10
+            self.current_room = 'treasure'
+            return 30
+        else:
+            print("❌ Invalid choice! The wolf attacks while you hesitate!")
+            self.player_health -= 25
+            return -10
+    
+    def room_cave(self):
+        """Cave room"""
+        print("🕳️ Inside the cave, you find ancient markings on the wall.")
+        print("1. Study the markings carefully")
+        print("2. Search for hidden passages")
+        print("3. Light a torch and go deeper")
+        
+        choice = input("What do you do? (1-3): ")
+        
+        if choice == '1':
+            print("📜 The markings reveal the location of treasure!")
+            self.current_room = 'treasure'
+            return 25
+        elif choice == '2':
+            if random.random() < 0.5:  # 50% chance
+                print("🔍 You find a secret passage with gold!")
+                self.player_gold += 15
+                self.current_room = 'treasure'
+                return 30
+            else:
+                print("🕳️ You trigger a trap and get injured!")
+                self.player_health -= 15
+                self.current_room = 'treasure'
+                return 10
+        elif choice == '3':
+            print("🔥 Your torch illuminates beautiful crystals worth gold!")
+            self.player_gold += 25
+            self.current_room = 'treasure'
+            return 35
+        else:
+            print("❌ Invalid choice! You get lost in the darkness.")
+            self.player_health -= 10
+            return -5
+    
+    def room_treasure(self):
+        """Final treasure room"""
+        print("💎 You reach the legendary treasure chamber!")
+        print(f"💰 You have {self.player_gold} gold")
+        print(f"❤️ Health: {self.player_health}/100")
+        
+        treasure_value = random.randint(30, 60)
+        print(f"🏆 You find a treasure worth {treasure_value} gold!")
+        
+        self.current_room = 'end'
+        return treasure_value + self.player_gold
+
+
+class NumberPuzzle:
+    """Number guessing and math puzzle game"""
+    
+    def __init__(self):
+        self.name = "Number Puzzle"
+    
+    def play(self):
+        """Play the number puzzle game"""
+        print(f"\n🔢 Welcome to {self.name}!")
+        print("Solve number puzzles to earn points!")
+        print()
+        
+        total_score = 0
+        
+        # Puzzle 1: Number guessing
+        total_score += self.guessing_game()
+        
+        # Puzzle 2: Math sequence
+        total_score += self.sequence_puzzle()
+        
+        # Puzzle 3: Quick math
+        total_score += self.quick_math()
+        
+        return total_score
+    
+    def guessing_game(self):
+        """Number guessing mini-game"""
+        print("🎯 Puzzle 1: Guess the Number (1-50)")
+        
+        target = random.randint(1, 50)
+        attempts = 0
+        max_attempts = 7
+        
+        while attempts < max_attempts:
+            try:
+                guess = int(input(f"Attempt {attempts + 1}/{max_attempts}: "))
+                attempts += 1
+                
+                if guess == target:
+                    score = max(10, 50 - attempts * 5)
+                    print(f"🎉 Correct! Score: {score}")
+                    return score
+                elif guess < target:
+                    print("📈 Too low!")
+                else:
+                    print("📉 Too high!")
+                    
+            except ValueError:
+                print("❌ Please enter a valid number!")
+        
+        print(f"💔 Out of attempts! The number was {target}")
+        return 5  # Consolation points
+    
+    def sequence_puzzle(self):
+        """Number sequence puzzle"""
+        print("\n🔢 Puzzle 2: Complete the Sequence")
+        
+        sequences = [
+            ([2, 4, 6, 8], 10, "Even numbers"),
+            ([1, 4, 9, 16], 25, "Perfect squares"),
+            ([1, 1, 2, 3, 5], 8, "Fibonacci sequence"),
+            ([10, 20, 30, 40], 50, "Multiples of 10")
+        ]
+        
+        sequence_data = random.choice(sequences)
+        sequence, answer, hint = sequence_data
+        
+        print(f"Sequence: {sequence}")
+        print("What comes next?")
+        
+        try:
+            guess = int(input("Your answer: "))
+            
+            if guess == answer:
+                print(f"✅ Correct! ({hint})")
+                return 30
+            else:
+                print(f"❌ Wrong! The answer was {answer} ({hint})")
+                return 10
+                
+        except ValueError:
+            print("❌ Invalid input!")
+            return 0
+    
+    def quick_math(self):
+        """Quick math challenge"""
+        print("\n⚡ Puzzle 3: Quick Math Challenge")
+        print("Solve 3 math problems as fast as you can!")
+        
+        score = 0
+        
+        for i in range(3):
+            a = random.randint(10, 50)
+            b = random.randint(1, 20)
+            operation = random.choice(['+', '-', '*'])
+            
+            if operation == '+':
+                answer = a + b
+            elif operation == '-':
+                answer = a - b
+            else:  # multiplication
+                answer = a * b
+            
+            print(f"\nProblem {i+1}: {a} {operation} {b} = ?")
+            
+            try:
+                guess = int(input("Answer: "))
+                
+                if guess == answer:
+                    print("✅ Correct!")
+                    score += 15
+                else:
+                    print(f"❌ Wrong! The answer was {answer}")
+                    score += 5
+                    
+            except ValueError:
+                print("❌ Invalid input!")
+        
+        print(f"\nQuick Math Score: {score}/45")
+        return score
+
+
+class MemoryGame:
+    """Memory sequence game"""
+    
+    def __init__(self):
+        self.name = "Memory Game"
+    
+    def play(self):
+        """Play the memory game"""
+        print(f"\n🧩 Welcome to {self.name}!")
+        print("Remember the sequence and repeat it!")
+        print()
+        
+        sequence = []
+        score = 0
+        round_num = 1
+        
+        while round_num <= 5:
+            # Add new number to sequence
+            sequence.append(random.randint(1, 9))
+            
+            print(f"Round {round_num}: Memorize this sequence")
+            print("Sequence:", ' '.join(map(str, sequence)))
+            
+            input("Press Enter when ready to input the sequence...")
+            
+            # Clear the sequence from view (simulate)
+            print("\\n" * 3)
+            print("Now enter the sequence:")
+            
+            try:
+                user_input = input("Enter numbers separated by spaces: ")
+                user_sequence = list(map(int, user_input.split()))
+                
+                if user_sequence == sequence:
+                    points = round_num * 10
+                    score += points
+                    print(f"✅ Correct! +{points} points")
+                    round_num += 1
+                else:
+                    print(f"❌ Wrong! The sequence was: {' '.join(map(str, sequence))}")
+                    break
+                    
+            except ValueError:
+                print("❌ Invalid input format!")
+                break
+            
+            print(f"Current score: {score}")
+            print()
+        
+        if round_num > 5:
+            bonus = 50
+            score += bonus
+            print(f"🎉 Perfect memory! Bonus: +{bonus} points!")
+        
+        print(f"Memory Game completed! Final score: {score}")
+        return score
+
+
+# Create and run the complete game engine
+if __name__ == "__main__":
+    game_engine = GameEngine()
+    game_engine.play_session()</textarea>
+    <br>
+    <button class="button" onclick="runGameCode(3)">🚀 Run Complete Game</button>
+    
+    <div id="gameOutput3" class="code-output hidden"></div>
+  </div>
+</div>
+
+<!-- Result Screen -->
+<div id="endScreen" class="section hidden">
+  <h2>🏁 Congratulations! 🎉</h2>
+  <p id="resultSummary"></p>
+  <div class="navigation">
+    <button class="button" onclick="goToMenu()">🏠 Main Menu</button>
+    <button class="button" onclick="celebrateCompletion()">🎉 Celebrate!</button>
+  </div>
+</div>
+
+</div>
+
+<div class="navigation">
+  <a href="levels9-10.html" class="nav-btn">← Levels 9-10</a>
+  <a href="index.html" class="nav-btn">🏠 Main Menu</a>
+</div>
+
+<script>
+// Game State
+let currentSection = 'menu';
+let currentLogicLesson = 1;
+let currentGameLesson = 1;
+let gameProgress = {
+  logic: false,
+  game: false
+};
+
+// Rock Paper Scissors Game State
+let rpsPlayerScore = 0;
+let rpsComputerScore = 0;
+let rpsRound = 1;
+let rpsMaxRounds = 5;
+
+// Initialize game
+window.onload = () => {
+  createStars();
+  updateDisplay();
+  goToMenu();
+  loadProgress();
+};
+
+function createStars() {
+  const starsContainer = document.getElementById('stars');
+  for (let i = 0; i < 100; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+    star.style.animationDelay = Math.random() * 2 + 's';
+    starsContainer.appendChild(star);
+  }
+}
+
+function updateDisplay() {
+  const totalXP = parseInt(localStorage.getItem("totalXP") || "0");
+  document.getElementById("totalXP").textContent = totalXP;
+  
+  // Calculate progress
+  const completedLevels = Object.values(gameProgress).filter(Boolean).length;
+  const progress = (completedLevels / 2) * 100;
+  
+  document.getElementById("progressFill").style.width = progress + '%';
+  document.getElementById("progressText").textContent = Math.round(progress) + '%';
+  
+  updateLevelCards();
+}
+
+function updateLevelCards() {
+  const cards = ['logicCard', 'gameCard'];
+  const levels = ['logic', 'game'];
+  
+  cards.forEach((cardId, index) => {
+    const card = document.getElementById(cardId);
+    const level = levels[index];
+    
+    card.classList.remove('completed', 'active');
+    
+    if (gameProgress[level]) {
+      card.classList.add('completed');
+    } else if (currentSection === level) {
+      card.classList.add('active');
+    }
+  });
+}
+
+function goToMenu() {
+  hideAllSections();
+  currentSection = 'menu';
+  updateDisplay();
+}
+
+function goToLevel(level) {
+  currentSection = level;
+  hideAllSections();
+  
+  if (level === 'logic') {
+    document.getElementById('logicLevel').classList.remove('hidden');
+    showLogicLesson(1);
+  } else if (level === 'game') {
+    document.getElementById('gameLevel').classList.remove('hidden');
+    showGameLesson(1);
+  }
+  
+  updateDisplay();
+}
+
+function hideAllSections() {
+  document.querySelectorAll(".section").forEach(el => el.classList.add("hidden"));
+}
+
+function showLogicLesson(lessonNum) {
+  // Hide all logic lessons
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById(`logicLesson${i}`).classList.add('hidden');
+  }
+  
+  // Update tab styles
+  const logicTabs = document.querySelector('#logicLevel .lesson-tabs').children;
+  Array.from(logicTabs).forEach(tab => tab.classList.remove('active'));
+  logicTabs[lessonNum - 1].classList.add('active');
+  
+  // Show selected lesson
+  document.getElementById(`logicLesson${lessonNum}`).classList.remove('hidden');
+  currentLogicLesson = lessonNum;
+}
+
+function showGameLesson(lessonNum) {
+  // Hide all game lessons
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById(`gameLesson${i}`).classList.add('hidden');
+  }
+  
+  // Update tab styles
+  const gameTabs = document.querySelector('#gameLevel .lesson-tabs').children;
+  Array.from(gameTabs).forEach(tab => tab.classList.remove('active'));
+  gameTabs[lessonNum - 1].classList.add('active');
+  
+  // Show selected lesson
+  document.getElementById(`gameLesson${lessonNum}`).classList.remove('hidden');
+  currentGameLesson = lessonNum;
+}
+
+function runLogicCode(lessonNum) {
+  const code = document.getElementById(`logicCode${lessonNum}`).value;
+  const output = document.getElementById(`logicOutput${lessonNum}`);
+  
+  output.classList.remove('hidden');
+  
+  try {
+    let result = 'Code executed successfully! In a real Python environment, this would show:\n\n';
+    
+    if (code.includes('and') || code.includes('or') || code.includes('not')) {
+      result += '• Complex boolean logic evaluation\n';
+      result += '• Conditional decision making\n';
+      result += '• Multi-criteria analysis\n';
+    }
+    
+    if (lessonNum === 3 && code.includes('class') && code.includes('def')) {
+      result += '\n🎉 Outstanding Logic Puzzle Solver! Your program demonstrates:\n';
+      result += '✅ Advanced boolean algebra\n';
+      result += '✅ Constraint satisfaction algorithms\n';
+      result += '✅ Complex problem modeling\n';
+      result += '✅ Systematic solution exploration\n';
+      
+      gameProgress.logic = true;
+      const xp = parseInt(localStorage.getItem("totalXP") || "0") + 600;
+      localStorage.setItem("totalXP", xp);
+      saveProgress();
+      updateDisplay();
+    }
+    
+    output.innerHTML = '<strong>🖥️ Output:</strong><br>' + result;
+    
+  } catch (error) {
+    output.innerHTML = `<strong>❌ Error:</strong><br>${error.message}`;
+  }
+}
+
+function runGameCode(lessonNum) {
+  const code = document.getElementById(`gameCode${lessonNum}`).value;
+  const output = document.getElementById(`gameOutput${lessonNum}`);
+  
+  output.classList.remove('hidden');
+  
+  try {
+    let result = 'Code executed successfully! In a real Python environment, this would show:\n\n';
+    
+    if (code.includes('random') && code.includes('class')) {
+      result += '• Interactive game mechanics\n';
+      result += '• Random event generation\n';
+      result += '• Player state management\n';
+    }
+    
+    if (lessonNum === 3 && code.includes('GameEngine') && code.includes('def play_session')) {
+      result += '\n🎉 Amazing Complete Game Engine! Your application demonstrates:\n';
+      result += '✅ Multiple game implementations\n';
+      result += '✅ Player progression systems\n';
+      result += '✅ Achievement tracking\n';
+      result += '✅ Save/load functionality\n';
+      result += '✅ Professional game architecture\n';
+      
+      gameProgress.game = true;
+      const xp = parseInt(localStorage.getItem("totalXP") || "0") + 800;
+      localStorage.setItem("totalXP", xp);
+      saveProgress();
+      updateDisplay();
+      
+      // Check if both levels are complete
+      if (gameProgress.logic && gameProgress.game) {
+        setTimeout(() => {
+          showCompletionScreen();
+        }, 2000);
+      }
+    }
+    
+    output.innerHTML = '<strong>🖥️ Output:</strong><br>' + result;
+    
+  } catch (error) {
+    output.innerHTML = `<strong>❌ Error:</strong><br>${error.message}`;
+  }
+}
+
+// Rock Paper Scissors Game Functions
+function playRPS(playerChoice) {
+  if (rpsPlayerScore >= 3 || rpsComputerScore >= 3) {
+    return; // Game already finished
+  }
+  
+  const choices = ['rock', 'paper', 'scissors'];
+  const computerChoice = choices[Math.floor(Math.random() * 3)];
+  
+  let result = '';
+  let winner = '';
+  
+  if (playerChoice === computerChoice) {
+    result = "It's a tie!";
+    winner = 'tie';
+  } else if (
+    (playerChoice === 'rock' && computerChoice === 'scissors') ||
+    (playerChoice === 'paper' && computerChoice === 'rock') ||
+    (playerChoice === 'scissors' && computerChoice === 'paper')
+  ) {
+    result = "You win this round!";
+    winner = 'player';
+    rpsPlayerScore++;
+  } else {
+    result = "Computer wins this round!";
+    winner = 'computer';
+    rpsComputerScore++;
+  }
+  
+  // Update display
+  document.getElementById('rpsScore').textContent = `Player: ${rpsPlayerScore} | Computer: ${rpsComputerScore}`;
+  document.getElementById('rpsRound').textContent = `Round ${rpsRound} of ${rpsMaxRounds}`;
+  
+  const choiceEmojis = {
+    'rock': '🪨',
+    'paper': '📄',
+    'scissors': '✂️'
+  };
+  
+  let resultText = `You: ${choiceEmojis[playerChoice]} | Computer: ${choiceEmojis[computerChoice]}\n${result}`;
+  
+  // Check for game end
+  if (rpsPlayerScore >= 3) {
+    resultText += '\n🏆 YOU WIN THE TOURNAMENT!';
+    gameProgress.game = true;
+    const xp = parseInt(localStorage.getItem("totalXP") || "0") + 100;
+    localStorage.setItem("totalXP", xp);
+    saveProgress();
+    updateDisplay();
+  } else if (rpsComputerScore >= 3) {
+    resultText += '\n🤖 Computer wins the tournament!';
+  } else {
+    rpsRound++;
+    resultText += `\nFirst to 3 wins!`;
+  }
+  
+  document.getElementById('rpsResult').textContent = resultText;
+}
+
+function resetRPS() {
+  rpsPlayerScore = 0;
+  rpsComputerScore = 0;
+  rpsRound = 1;
+  
+  document.getElementById('rpsScore').textContent = 'Player: 0 | Computer: 0';
+  document.getElementById('rpsRound').textContent = 'Round 1 of 5';
+  document.getElementById('rpsResult').textContent = 'Choose your move!';
+}
+
+function showCompletionScreen() {
+  document.getElementById('resultSummary').innerHTML = `
+    <div style="text-align: center; font-size: 18px;">
+      <h3>🏆 LEVELS 11-12 MASTERED! 🏆</h3>
+      <p>🎉 Congratulations! You've completed Advanced Logic & Game Development!</p>
+      <p><strong>🎓 Skills Mastered:</strong></p>
+      <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+        <li>✅ Boolean logic and complex conditions</li>
+        <li>✅ Logical operators (AND, OR, NOT)</li>
+        <li>✅ Truth tables and logical reasoning</li>
+        <li>✅ Constraint satisfaction problems</li>
+        <li>✅ Game mechanics and state management</li>
+        <li>✅ Random events and probability</li>
+        <li>✅ Interactive user interfaces</li>
+        <li>✅ Complete game development</li>
+      </ul>
+      <p><strong>🌟 Total XP Earned:</strong> ${localStorage.getItem("totalXP") || "0"}</p>
+      <p>🚀 You're now ready for the most advanced programming challenges!</p>
+    </div>
+  `;
+  
+  hideAllSections();
+  document.getElementById('endScreen').classList.remove('hidden');
+}
+
+function celebrateCompletion() {
+  alert('🎉 Amazing work! You\'ve mastered advanced logic and game development! 🎉');
+}
+
+function loadProgress() {
+  const saved = localStorage.getItem('gameProgress');
+  if (saved) {
+    const savedProgress = JSON.parse(saved);
+    gameProgress.logic = savedProgress.logic || false;
+    gameProgress.game = savedProgress.game || false;
+  }
+}
+
+function saveProgress() {
+  localStorage.setItem('gameProgress', JSON.stringify(gameProgress));
+}
+
+// Initialize
+updateDisplay();
+</script>
+</body>
+</html>

@@ -1,0 +1,2407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Quest: Levels 7-8 - Arrays & Objects</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 20%, #2d1b69 40%, #4a148c 60%, #6a1b9a 100%);
+      color: #fff;
+      margin: 0;
+      padding: 0; 
+      text-align: center;
+      min-height: 100vh;
+    }
+    
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite alternate;
+    }
+    
+    @keyframes twinkle {
+      0% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+    
+    .game-container {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .hud {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(41, 41, 72, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px 25px;
+      border-radius: 15px;
+      border: 2px solid #e91e63;
+      font-weight: bold;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(233, 30, 99, 0.3);
+    }
+    
+    .progress-bar {
+      width: 200px;
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      margin: 5px 0;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e91e63, #ff5722);
+      transition: width 0.5s ease;
+      border-radius: 4px;
+    }
+    
+    header {
+      text-align: center;
+      background: rgba(21, 21, 43, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(233, 30, 99, 0.3);
+    }
+    
+    .level-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .level-card {
+      background: rgba(41, 41, 72, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px solid #444;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .level-card:hover {
+      border-color: #e91e63;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(233, 30, 99, 0.3);
+    }
+    
+    .level-card.active {
+      border-color: #e91e63;
+      background: rgba(233, 30, 99, 0.1);
+    }
+    
+    .level-card.completed {
+      border-color: #00ff00;
+      background: rgba(0, 255, 0, 0.1);
+    }
+    
+    .section {
+      background: rgba(41, 41, 72, 0.8);
+      backdrop-filter: blur(10px);
+      margin: 20px 0;
+      padding: 30px;
+      border-radius: 20px;
+      border: 2px dashed #e91e63;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .button {
+      padding: 12px 24px;
+      margin: 8px;
+      background: linear-gradient(45deg, #e91e63, #c2185b);
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+    
+    .button:hover {
+      background: linear-gradient(45deg, #d81b60, #ad1457);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(233, 30, 99, 0.4);
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .code-editor {
+      background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+      color: #d4d4d4;
+      padding: 25px;
+      border-radius: 15px;
+      font-family: 'Courier New', monospace;
+      text-align: left;
+      margin: 20px 0;
+      border: 2px solid #666;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+    
+    .code-output {
+      background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+      color: #00ff88;
+      padding: 20px;
+      border-radius: 15px;
+      font-family: 'Courier New', monospace;
+      text-align: left;
+      margin: 20px 0;
+      border: 2px solid #00ff88;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+      font-size: 1.1em;
+    }
+    
+    textarea {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+      color: #d4d4d4;
+      border: 2px solid #666;
+      border-radius: 15px;
+      padding: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      resize: vertical;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+      line-height: 1.5;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: #e91e63;
+      box-shadow: 0 0 20px rgba(233, 30, 99, 0.3);
+      background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
+    }
+    
+    .tip-box {
+      background: linear-gradient(45deg, #2a2a4a, #3a3a5a, #4a4a6a);
+      border-left: 8px solid #ff9800;
+      border-radius: 15px;
+      padding: 25px;
+      margin: 25px 0;
+      box-shadow: 0 0 20px rgba(255, 152, 0, 0.2);
+    }
+    
+    .tip-box h3 {
+      color: #ff9800;
+      margin-top: 0;
+      font-size: 1.3em;
+    }
+    
+    .lesson-tabs {
+      display: flex;
+      justify-content: center;
+      margin: 25px 0;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .lesson-tab {
+      padding: 12px 25px;
+      background: rgba(233, 30, 99, 0.1);
+      border: 2px solid #e91e63;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+    
+    .lesson-tab.active {
+      background: #e91e63;
+      color: white;
+      box-shadow: 0 0 15px rgba(233, 30, 99, 0.5);
+    }
+    
+    .lesson-tab:hover {
+      background: rgba(233, 30, 99, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin: 30px auto;
+      max-width: 800px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .nav-btn {
+      background: linear-gradient(45deg, #444, #666);
+      color: #e91e63;
+      padding: 12px 24px;
+      border: 2px solid #e91e63;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 150px;
+      text-align: center;
+    }
+    
+    .nav-btn:hover {
+      background: linear-gradient(45deg, #e91e63, #c2185b);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+    }
+    
+    .array-examples {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin: 25px 0;
+    }
+    
+    .array-card {
+      background: linear-gradient(135deg, #1b1b33, #2b2b43);
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px solid #e91e63;
+      box-shadow: 0 0 15px rgba(233, 30, 99, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .array-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(233, 30, 99, 0.3);
+    }
+    
+    .array-card h4 {
+      color: #ff9800;
+      margin-top: 0;
+    }
+    
+    /* Interactive Elements */
+    .drag-drop-area {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px dashed #e91e63;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+      min-height: 100px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .draggable-item {
+      background: linear-gradient(45deg, #e91e63, #c2185b);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+    
+    .draggable-item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(233, 30, 99, 0.4);
+    }
+    
+    .draggable-item.dragging {
+      opacity: 0.5;
+      transform: rotate(5deg);
+    }
+    
+    .drop-zone {
+      background: rgba(233, 30, 99, 0.1);
+      border: 2px dashed #e91e63;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px;
+      min-width: 100px;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .drop-zone.drag-over {
+      background: rgba(233, 30, 99, 0.3);
+      border-color: #ff4081;
+      transform: scale(1.05);
+    }
+    
+    .array-visualizer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    
+    .array-element {
+      background: linear-gradient(45deg, #2196f3, #1976d2);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      min-width: 60px;
+      text-align: center;
+      font-weight: bold;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .array-element:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+    }
+    
+    .array-element::before {
+      content: attr(data-index);
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #888;
+    }
+    
+    .quiz-container {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      padding: 25px;
+      margin: 20px 0;
+    }
+    
+    .quiz-option {
+      background: rgba(233, 30, 99, 0.1);
+      border: 2px solid #e91e63;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+    
+    .quiz-option:hover {
+      background: rgba(233, 30, 99, 0.2);
+      transform: translateX(5px);
+    }
+    
+    .quiz-option.correct {
+      background: rgba(76, 175, 80, 0.3);
+      border-color: #4caf50;
+    }
+    
+    .quiz-option.incorrect {
+      background: rgba(244, 67, 54, 0.3);
+      border-color: #f44336;
+    }
+    
+    @media (max-width: 768px) {
+      .game-container {
+        padding: 10px;
+      }
+      
+      .level-selector {
+        grid-template-columns: 1fr;
+      }
+      
+      .hud {
+        position: static;
+        margin-bottom: 20px;
+      }
+      
+      .array-visualizer {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="hud">
+  <div>🌟 Total XP: <span id="totalXP">0</span></div>
+  <div>🎯 Current Level: <span id="currentLevel">7-8</span></div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div>📈 Progress: <span id="progressText">0%</span></div>
+</div>
+
+<div class="game-container">
+
+<header>
+  <h1>🎮 Code Quest: Levels 7-8</h1>
+  <p>Arrays & Lists + Objects & Dictionaries</p>
+  
+  <div class="level-selector">
+    <div class="level-card" onclick="goToLevel('arrays')" id="arraysCard">
+      <h3>📋 Level 7: Arrays & Lists</h3>
+      <p>Storing multiple values, indexing</p>
+      <div>Interactive drag & drop activities</div>
+    </div>
+    <div class="level-card" onclick="goToLevel('objects')" id="objectsCard">
+      <h3>🗂️ Level 8: Objects & Dictionaries</h3>
+      <p>Key-value pairs, data organization</p>
+      <div>Character stats & real scenarios</div>
+    </div>
+  </div>
+</header>
+
+<!-- Level 7: Arrays & Lists -->
+<div id="arraysLevel" class="section hidden">
+  <h2>📋 Arrays and Lists - Storing Multiple Values</h2>
+  
+  <div class="lesson-tabs">
+    <div class="lesson-tab active" onclick="showArrayLesson(1)">📋 List Basics</div>
+    <div class="lesson-tab" onclick="showArrayLesson(2)">🎯 Accessing Data</div>
+    <div class="lesson-tab" onclick="showArrayLesson(3)">🔄 List Operations</div>
+    <div class="lesson-tab" onclick="showArrayLesson(4)">🏆 Challenge</div>
+  </div>
+
+  <div id="arrayLesson1" class="hidden">
+    <h3>📋 Introduction to Lists</h3>
+    <p>Lists are like containers that can hold multiple items in order. Think of them as a shopping list, a playlist, or a collection of your favorite things!</p>
+    
+    <div class="array-examples">
+      <div class="array-card">
+        <h4>🛒 Shopping List Example</h4>
+        <div class="code-editor">
+          # Creating a shopping list<br>
+          shopping_list = ["apples", "bread", "milk", "eggs"]<br><br>
+          
+          print("My shopping list:")<br>
+          for item in shopping_list:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print(f"- {item}")<br><br>
+          
+          # List length<br>
+          print(f"I need to buy {len(shopping_list)} items")
+        </div>
+      </div>
+      
+      <div class="array-card">
+        <h4>🎵 Music Playlist</h4>
+        <div class="code-editor">
+          # Different types in one list<br>
+          playlist = ["Bohemian Rhapsody", "Imagine", "Hotel California"]<br>
+          ratings = [5, 4, 5, 3, 4]<br>
+          mixed_data = ["Song", 2024, True, 4.5]<br><br>
+          
+          print("Favorite songs:", playlist)<br>
+          print("Ratings:", ratings)<br>
+          print("Mixed data:", mixed_data)
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <h3>🔑 List Essentials</h3>
+      <p>• **Square brackets []**: Create lists<br>
+      • **Commas**: Separate items<br>
+      • **Any data type**: Numbers, strings, booleans<br>
+      • **len()**: Get the number of items<br>
+      • **Ordered**: Items stay in the order you put them</p>
+    </div>
+
+    <h4>🎯 Interactive Activity: Build Your List!</h4>
+    <p>Drag items into the list container to create your own list:</p>
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 20px 0;">
+      <div class="draggable-item" draggable="true" data-value="pizza">🍕 pizza</div>
+      <div class="draggable-item" draggable="true" data-value="guitar">🎸 guitar</div>
+      <div class="draggable-item" draggable="true" data-value="book">📚 book</div>
+      <div class="draggable-item" draggable="true" data-value="game">🎮 game</div>
+      <div class="draggable-item" draggable="true" data-value="movie">🎬 movie</div>
+      <div class="draggable-item" draggable="true" data-value="coffee">☕ coffee</div>
+    </div>
+    
+    <div class="drag-drop-area" id="listContainer">
+      <p style="color: #888; margin: 0;">Drag items here to build your list!</p>
+    </div>
+    
+    <div id="listOutput" style="margin-top: 20px; font-family: 'Courier New', monospace; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; display: none;">
+      <strong>Your List:</strong><br>
+      <span id="listCode">my_list = []</span>
+    </div>
+
+    <p><strong>🎯 Practice Creating Lists!</strong></p>
+    <textarea id="arrayCode1" placeholder="Create your own lists here...">print("🎯 My Favorite Things Lists")
+print("=" * 35)
+
+# Create different types of lists
+favorite_colors = ["blue", "green", "purple", "red"]
+lucky_numbers = [7, 13, 21, 42]
+hobbies = ["reading", "gaming", "cooking", "hiking"]
+
+print("Favorite colors:", favorite_colors)
+print("Lucky numbers:", lucky_numbers)
+print("Hobbies:", hobbies)
+
+# List operations
+print(f"\nI have {len(favorite_colors)} favorite colors")
+print(f"My first hobby is: {hobbies[0]}")
+print(f"My last lucky number is: {lucky_numbers[-1]}")
+
+# Create a mixed list
+about_me = ["Alex", 16, True, 5.8, "student"]
+print(f"\nAbout me: {about_me}")</textarea>
+    <br>
+    <button class="button" onclick="runArrayCode(1)">▶️ Run Code</button>
+    
+    <div id="arrayOutput1" class="code-output hidden"></div>
+  </div>
+
+  <div id="arrayLesson2" class="hidden">
+    <h3>🎯 Accessing List Elements</h3>
+    <p>Each item in a list has a position called an "index". Python starts counting from 0, so the first item is at index 0, the second at index 1, and so on!</p>
+    
+    <div class="array-visualizer" id="indexDemo">
+      <div class="array-element" data-index="0">apple</div>
+      <div class="array-element" data-index="1">banana</div>
+      <div class="array-element" data-index="2">cherry</div>
+      <div class="array-element" data-index="3">date</div>
+      <div class="array-element" data-index="4">elderberry</div>
+    </div>
+    
+    <div class="array-examples">
+      <div class="array-card">
+        <h4>📍 Positive Indexing</h4>
+        <div class="code-editor">
+          fruits = ["apple", "banana", "cherry", "date"]<br><br>
+          
+          print("First fruit:", fruits[0])      # apple<br>
+          print("Second fruit:", fruits[1])     # banana<br>
+          print("Third fruit:", fruits[2])      # cherry<br>
+          print("Fourth fruit:", fruits[3])     # date<br><br>
+          
+          # Get multiple elements<br>
+          print("First two:", fruits[0:2])      # ['apple', 'banana']<br>
+          print("Last two:", fruits[2:4])       # ['cherry', 'date']
+        </div>
+      </div>
+      
+      <div class="array-card">
+        <h4>🔄 Negative Indexing</h4>
+        <div class="code-editor">
+          fruits = ["apple", "banana", "cherry", "date"]<br><br>
+          
+          print("Last fruit:", fruits[-1])      # date<br>
+          print("Second last:", fruits[-2])     # cherry<br>
+          print("Third last:", fruits[-3])      # banana<br>
+          print("Fourth last:", fruits[-4])     # apple<br><br>
+          
+          # Slicing with negative indices<br>
+          print("Last two:", fruits[-2:])       # ['cherry', 'date']<br>
+          print("All except last:", fruits[:-1]) # ['apple', 'banana', 'cherry']
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <h3>🎯 Indexing Rules</h3>
+      <p>• **Index starts at 0**: First item is [0], not [1]<br>
+      • **Negative indices**: Count backwards from the end<br>
+      • **Slicing [start:end]**: Get multiple items<br>
+      • **Out of bounds**: Accessing non-existent index causes error</p>
+    </div>
+
+    <h4>🧩 Interactive Quiz: Array Access</h4>
+    <div class="quiz-container">
+      <p><strong>Given the list: <code>colors = ["red", "green", "blue", "yellow", "purple"]</code></strong></p>
+      <p>What does <code>colors[2]</code> return?</p>
+      
+      <div class="quiz-option" onclick="selectQuizAnswer(this, false)">A) "green"</div>
+      <div class="quiz-option" onclick="selectQuizAnswer(this, true)">B) "blue"</div>
+      <div class="quiz-option" onclick="selectQuizAnswer(this, false)">C) "yellow"</div>
+      <div class="quiz-option" onclick="selectQuizAnswer(this, false)">D) "red"</div>
+      
+      <div id="quizFeedback" style="margin-top: 15px; display: none;"></div>
+    </div>
+
+    <p><strong>🎯 Practice Array Access!</strong></p>
+    <textarea id="arrayCode2" placeholder="Practice accessing list elements...">print("🎮 Game Inventory System")
+print("=" * 30)
+
+# Player inventory
+inventory = ["sword", "shield", "potion", "key", "map", "gold"]
+scores = [1250, 980, 1500, 750, 2000]
+
+print("Inventory:", inventory)
+print("Scores:", scores)
+print()
+
+# Access specific items
+print("🗡️ Weapon:", inventory[0])
+print("🛡️ Defense:", inventory[1])
+print("🧪 Healing:", inventory[2])
+print()
+
+# Access from the end
+print("💰 Last item:", inventory[-1])
+print("🗺️ Second last:", inventory[-2])
+print()
+
+# Slicing examples
+print("⚔️ Combat gear:", inventory[0:2])
+print("🎒 Utility items:", inventory[2:5])
+print("📊 Top 3 scores:", scores[:3])
+print("📈 Recent scores:", scores[-3:])
+print()
+
+# List information
+print(f"📦 Total items: {len(inventory)}")
+print(f"🏆 Highest score: {max(scores)}")
+print(f"📉 Lowest score: {min(scores)}")</textarea>
+    <br>
+    <button class="button" onclick="runArrayCode(2)">▶️ Run Code</button>
+    
+    <div id="arrayOutput2" class="code-output hidden"></div>
+  </div>
+
+  <div id="arrayLesson3" class="hidden">
+    <h3>🔄 List Operations and Methods</h3>
+    <p>Lists are dynamic! You can add, remove, and modify items. This makes them perfect for managing changing data like todo lists, game inventories, or user collections.</p>
+    
+    <div class="array-examples">
+      <div class="array-card">
+        <h4>➕ Adding Items</h4>
+        <div class="code-editor">
+          # Start with an empty list<br>
+          todo_list = []<br><br>
+          
+          # Add items one by one<br>
+          todo_list.append("Study Python")<br>
+          todo_list.append("Walk the dog")<br>
+          todo_list.append("Buy groceries")<br><br>
+          
+          print("Todo list:", todo_list)<br><br>
+          
+          # Insert at specific position<br>
+          todo_list.insert(1, "Call mom")<br>
+          print("Updated list:", todo_list)<br><br>
+          
+          # Add multiple items<br>
+          todo_list.extend(["Exercise", "Read book"])<br>
+          print("Final list:", todo_list)
+        </div>
+      </div>
+      
+      <div class="array-card">
+        <h4>➖ Removing Items</h4>
+        <div class="code-editor">
+          shopping_cart = ["laptop", "mouse", "keyboard", "monitor"]<br><br>
+          
+          print("Cart:", shopping_cart)<br><br>
+          
+          # Remove specific item<br>
+          shopping_cart.remove("mouse")<br>
+          print("After removing mouse:", shopping_cart)<br><br>
+          
+          # Remove by index<br>
+          removed_item = shopping_cart.pop(1)<br>
+          print(f"Removed: {removed_item}")<br>
+          print("Cart now:", shopping_cart)<br><br>
+          
+          # Remove last item<br>
+          last_item = shopping_cart.pop()<br>
+          print(f"Last removed: {last_item}")<br>
+          print("Final cart:", shopping_cart)
+        </div>
+      </div>
+    </div>
+
+    <div class="array-examples">
+      <div class="array-card">
+        <h4>🔍 Finding and Counting</h4>
+        <div class="code-editor">
+          numbers = [1, 3, 7, 3, 9, 3, 5]<br><br>
+          
+          # Find index of item<br>
+          print("Index of 7:", numbers.index(7))<br><br>
+          
+          # Count occurrences<br>
+          print("Count of 3:", numbers.count(3))<br><br>
+          
+          # Check if item exists<br>
+          print("Is 9 in list?", 9 in numbers)<br>
+          print("Is 10 in list?", 10 in numbers)<br><br>
+          
+          # Sort the list<br>
+          numbers.sort()<br>
+          print("Sorted:", numbers)<br><br>
+          
+          # Reverse the list<br>
+          numbers.reverse()<br>
+          print("Reversed:", numbers)
+        </div>
+      </div>
+      
+      <div class="array-card">
+        <h4>🔄 Modifying Items</h4>
+        <div class="code-editor">
+          grades = [85, 90, 78, 92, 88]<br><br>
+          
+          print("Original grades:", grades)<br><br>
+          
+          # Change specific grade<br>
+          grades[2] = 82  # Improve the 78<br>
+          print("After improvement:", grades)<br><br>
+          
+          # Change multiple grades<br>
+          grades[0:2] = [87, 93]<br>
+          print("After updates:", grades)<br><br>
+          
+          # Calculate average<br>
+          average = sum(grades) / len(grades)<br>
+          print(f"Average grade: {average:.1f}")
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <h3>🛠️ Essential List Methods</h3>
+      <p>• **append()**: Add item to end<br>
+      • **insert(index, item)**: Add item at position<br>
+      • **remove(item)**: Remove first occurrence<br>
+      • **pop(index)**: Remove and return item<br>
+      • **sort()**: Sort the list<br>
+      • **reverse()**: Reverse the order</p>
+    </div>
+
+    <p><strong>🎯 Practice List Operations!</strong></p>
+    <textarea id="arrayCode3" placeholder="Practice modifying lists...">print("🎵 Dynamic Playlist Manager")
+print("=" * 35)
+
+# Start with a basic playlist
+playlist = ["Bohemian Rhapsody", "Imagine", "Hotel California"]
+print("Original playlist:", playlist)
+print()
+
+# Add new songs
+playlist.append("Stairway to Heaven")
+playlist.insert(1, "Yesterday")  # Insert at position 1
+print("After adding songs:", playlist)
+print()
+
+# User rates songs (1-5 stars)
+ratings = [5, 4, 5, 4, 3]
+print("Song ratings:", ratings)
+print()
+
+# Remove a song user doesn't like
+if 3 in ratings:
+    low_rating_index = ratings.index(3)
+    removed_song = playlist.pop(low_rating_index)
+    ratings.pop(low_rating_index)
+    print(f"Removed '{removed_song}' (low rating)")
+    print("Updated playlist:", playlist)
+    print("Updated ratings:", ratings)
+print()
+
+# Add more songs
+new_songs = ["Sweet Child O' Mine", "Thunderstruck"]
+playlist.extend(new_songs)
+ratings.extend([5, 4])
+print("Final playlist:", playlist)
+print("Final ratings:", ratings)
+print()
+
+# Playlist statistics
+print("📊 Playlist Stats:")
+print(f"Total songs: {len(playlist)}")
+print(f"Average rating: {sum(ratings)/len(ratings):.1f}")
+print(f"Highest rated: {max(ratings)} stars")
+print(f"Songs with 5 stars: {ratings.count(5)}")
+
+# Find a specific song
+if "Imagine" in playlist:
+    position = playlist.index("Imagine") + 1
+    print(f"'Imagine' is song #{position} in the playlist")</textarea>
+    <br>
+    <button class="button" onclick="runArrayCode(3)">▶️ Run Code</button>
+    
+    <div id="arrayOutput3" class="code-output hidden"></div>
+  </div>
+
+  <div id="arrayLesson4" class="hidden">
+    <h3>🏆 Challenge: Inventory Management System</h3>
+    <p><strong>Mission:</strong> Build a complete inventory management system for a game or store!</p>
+    
+    <div class="tip-box">
+      <h3>🎯 Challenge Requirements</h3>
+      <p>Create a program that can:</p>
+      <ul style="text-align: left;">
+        <li>Manage multiple lists (items, quantities, prices)</li>
+        <li>Add and remove inventory items</li>
+        <li>Search for specific items</li>
+        <li>Calculate total inventory value</li>
+        <li>Generate reports and statistics</li>
+        <li>Handle user input and choices</li>
+      </ul>
+    </div>
+
+    <textarea id="arrayCode4" placeholder="Build your inventory system here...">class InventoryManager:
+    def __init__(self):
+        self.items = []
+        self.quantities = []
+        self.prices = []
+        self.categories = []
+    
+    def add_item(self, name, quantity, price, category="General"):
+        """Add a new item to inventory"""
+        if name in self.items:
+            # Update existing item
+            index = self.items.index(name)
+            self.quantities[index] += quantity
+            print(f"Updated {name}: +{quantity} units")
+        else:
+            # Add new item
+            self.items.append(name)
+            self.quantities.append(quantity)
+            self.prices.append(price)
+            self.categories.append(category)
+            print(f"Added new item: {name}")
+    
+    def remove_item(self, name, quantity=None):
+        """Remove item or reduce quantity"""
+        if name not in self.items:
+            print(f"❌ {name} not found in inventory")
+            return
+        
+        index = self.items.index(name)
+        
+        if quantity is None or quantity >= self.quantities[index]:
+            # Remove completely
+            removed_qty = self.quantities[index]
+            self.items.pop(index)
+            self.quantities.pop(index)
+            self.prices.pop(index)
+            self.categories.pop(index)
+            print(f"Removed {name} completely ({removed_qty} units)")
+        else:
+            # Reduce quantity
+            self.quantities[index] -= quantity
+            print(f"Reduced {name} by {quantity} units")
+    
+    def search_item(self, name):
+        """Find item details"""
+        if name in self.items:
+            index = self.items.index(name)
+            return {
+                "name": name,
+                "quantity": self.quantities[index],
+                "price": self.prices[index],
+                "category": self.categories[index],
+                "value": self.quantities[index] * self.prices[index]
+            }
+        return None
+    
+    def get_category_items(self, category):
+        """Get all items in a category"""
+        category_items = []
+        for i, cat in enumerate(self.categories):
+            if cat.lower() == category.lower():
+                category_items.append({
+                    "name": self.items[i],
+                    "quantity": self.quantities[i],
+                    "price": self.prices[i]
+                })
+        return category_items
+    
+    def calculate_total_value(self):
+        """Calculate total inventory value"""
+        total = 0
+        for i in range(len(self.items)):
+            total += self.quantities[i] * self.prices[i]
+        return total
+    
+    def get_low_stock_items(self, threshold=5):
+        """Find items with low stock"""
+        low_stock = []
+        for i, qty in enumerate(self.quantities):
+            if qty <= threshold:
+                low_stock.append({
+                    "name": self.items[i],
+                    "quantity": qty,
+                    "price": self.prices[i]
+                })
+        return low_stock
+    
+    def display_inventory(self):
+        """Display complete inventory report"""
+        print("📦 INVENTORY MANAGEMENT SYSTEM")
+        print("=" * 50)
+        
+        if not self.items:
+            print("Inventory is empty!")
+            return
+        
+        # Group by category
+        categories = list(set(self.categories))
+        
+        for category in categories:
+            print(f"\n📂 {category.upper()} CATEGORY")
+            print("-" * 30)
+            
+            category_items = self.get_category_items(category)
+            category_value = 0
+            
+            for item in category_items:
+                value = item["quantity"] * item["price"]
+                category_value += value
+                stock_status = "🔴 LOW" if item["quantity"] <= 5 else "🟢 OK"
+                
+                print(f"• {item['name']}")
+                print(f"  Qty: {item['quantity']} | Price: ${item['price']:.2f} | Value: ${value:.2f} | {stock_status}")
+            
+            print(f"Category Total: ${category_value:.2f}")
+        
+        # Overall statistics
+        print(f"\n📊 INVENTORY STATISTICS")
+        print("-" * 25)
+        print(f"Total Items: {len(self.items)}")
+        print(f"Total Units: {sum(self.quantities)}")
+        print(f"Total Value: ${self.calculate_total_value():.2f}")
+        
+        # Low stock alert
+        low_stock = self.get_low_stock_items()
+        if low_stock:
+            print(f"\n⚠️ LOW STOCK ALERT ({len(low_stock)} items)")
+            for item in low_stock:
+                print(f"• {item['name']}: {item['quantity']} units remaining")
+
+# Demo the inventory system
+print("🏪 Setting up Gaming Store Inventory")
+print("=" * 40)
+
+inventory = InventoryManager()
+
+# Add gaming items
+inventory.add_item("Gaming Laptop", 5, 1299.99, "Electronics")
+inventory.add_item("Mechanical Keyboard", 15, 89.99, "Accessories")
+inventory.add_item("Gaming Mouse", 20, 59.99, "Accessories")
+inventory.add_item("4K Monitor", 8, 399.99, "Electronics")
+inventory.add_item("Headset", 12, 79.99, "Accessories")
+inventory.add_item("Graphics Card", 3, 699.99, "Electronics")
+inventory.add_item("SSD Drive", 25, 129.99, "Storage")
+
+print("\n🔍 Testing inventory operations...")
+
+# Test search
+laptop = inventory.search_item("Gaming Laptop")
+if laptop:
+    print(f"Found: {laptop['name']} - ${laptop['price']:.2f} ({laptop['quantity']} in stock)")
+
+# Test category search
+print(f"\nAccessories in stock:")
+accessories = inventory.get_category_items("Accessories")
+for item in accessories:
+    print(f"• {item['name']}: {item['quantity']} units")
+
+# Simulate sales
+inventory.remove_item("Gaming Laptop", 2)
+inventory.remove_item("Graphics Card", 1)
+
+# Add more stock
+inventory.add_item("Gaming Mouse", 10, 59.99, "Accessories")
+
+# Display full report
+print("\n")
+inventory.display_inventory()</textarea>
+    <br>
+    <button class="button" onclick="runArrayCode(4)">🚀 Run Inventory System</button>
+    
+    <div id="arrayOutput4" class="code-output hidden"></div>
+  </div>
+</div>
+
+<!-- Level 8: Objects & Dictionaries -->
+<div id="objectsLevel" class="section hidden">
+  <h2>🗂️ Objects and Dictionaries - Key-Value Data</h2>
+  
+  <div class="lesson-tabs">
+    <div class="lesson-tab active" onclick="showObjectLesson(1)">🗂️ Dictionary Basics</div>
+    <div class="lesson-tab" onclick="showObjectLesson(2)">🔑 Keys & Values</div>
+    <div class="lesson-tab" onclick="showObjectLesson(3)">🎮 Character Stats</div>
+    <div class="lesson-tab" onclick="showObjectLesson(4)">🏆 Challenge</div>
+  </div>
+
+  <div id="objectLesson1" class="hidden">
+    <h3>🗂️ Introduction to Dictionaries</h3>
+    <p>Dictionaries store data in key-value pairs, like a real dictionary where you look up a word (key) to find its meaning (value). They're perfect for organizing related information!</p>
+    
+    <div class="array-examples">
+      <div class="array-card">
+        <h4>👤 Person Profile</h4>
+        <div class="code-editor">
+          # Creating a person dictionary<br>
+          person = {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"name": "Alex",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"age": 16,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"city": "New York",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"student": True,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"grade": 10<br>
+          }<br><br>
+          
+          print("Person info:", person)<br>
+          print("Name:", person["name"])<br>
+          print("Age:", person["age"])<br>
+          print("Is student:", person["student"])
+        </div>
+      </div>
+      
+      <div class="array-card">
+        <h4>🏪 Product Information</h4>
+        <div class="code-editor">
+          # Product in an online store<br>
+          product = {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"id": "LAP001",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"name": "Gaming Laptop",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"price": 1299.99,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"in_stock": True,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"quantity": 5,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"category": "Electronics"<br>
+          }<br><br>
+          
+          print(f"Product: {product['name']}")<br>
+          print(f"Price: ${product['price']}")<br>
+          print(f"Available: {product['quantity']} units")
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <h3>🔑 Dictionary Essentials</h3>
+      <p>• **Curly braces {}**: Create dictionaries<br>
+      • **Key-value pairs**: "key": value<br>
+      • **Unique keys**: Each key appears only once<br>
+      • **Any data type**: Values can be strings, numbers, booleans, lists<br>
+      • **Unordered**: Items don't have a fixed position</p>
+    </div>
+
+    <h4>🎯 Interactive Activity: Match Keys to Values!</h4>
+    <p>Drag the values to match with their correct keys:</p>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+      <div>
+        <h5>🔑 Keys</h5>
+        <div class="drop-zone" data-key="name">name</div>
+        <div class="drop-zone" data-key="age">age</div>
+        <div class="drop-zone" data-key="hobby">hobby</div>
+        <div class="drop-zone" data-key="score">score</div>
+      </div>
+      <div>
+        <h5>📊 Values</h5>
+        <div class="draggable-item" draggable="true" data-value="gaming" data-type="string">"gaming"</div>
+        <div class="draggable-item" draggable="true" data-value="17" data-type="number">17</div>
+        <div class="draggable-item" draggable="true" data-value="Sarah" data-type="string">"Sarah"</div>
+        <div class="draggable-item" draggable="true" data-value="1250" data-type="number">1250</div>
+      </div>
+    </div>
+    
+    <div id="matchingResult" style="margin-top: 20px; font-family: 'Courier New', monospace; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; display: none;">
+      <strong>Your Dictionary:</strong><br>
+      <span id="dictCode">player = {}</span>
+    </div>
+
+    <p><strong>🎯 Practice Creating Dictionaries!</strong></p>
+    <textarea id="objectCode1" placeholder="Create your own dictionaries here...">print("🎮 Game Character Creation")
+print("=" * 35)
+
+# Create a game character
+character = {
+    "name": "DragonSlayer",
+    "level": 15,
+    "health": 100,
+    "mana": 80,
+    "class": "Warrior",
+    "weapon": "Enchanted Sword",
+    "location": "Mystic Forest"
+}
+
+print("Character Profile:")
+print(f"Name: {character['name']}")
+print(f"Level: {character['level']}")
+print(f"Class: {character['class']}")
+print(f"Health: {character['health']}/100")
+print(f"Mana: {character['mana']}/100")
+print(f"Weapon: {character['weapon']}")
+print(f"Location: {character['location']}")
+
+# Create a spell dictionary
+spell = {
+    "name": "Fireball",
+    "damage": 45,
+    "mana_cost": 20,
+    "range": "Medium",
+    "element": "Fire"
+}
+
+print(f"\nSpell: {spell['name']}")
+print(f"Damage: {spell['damage']}")
+print(f"Mana Cost: {spell['mana_cost']}")
+print(f"Element: {spell['element']}")
+
+# Create an inventory item
+item = {
+    "name": "Health Potion",
+    "type": "Consumable",
+    "effect": "Restore 50 HP",
+    "quantity": 3,
+    "value": 25
+}
+
+print(f"\nInventory Item: {item['name']}")
+print(f"Effect: {item['effect']}")
+print(f"Quantity: {item['quantity']}")
+print(f"Value: {item['value']} gold")</textarea>
+    <br>
+    <button class="button" onclick="runObjectCode(1)">▶️ Run Code</button>
+    
+    <div id="objectOutput1" class="code-output hidden"></div>
+  </div>
+
+  <div id="objectLesson2" class="hidden">
+    <h3>🔑 Working with Keys and Values</h3>
+    <p>Dictionaries are incredibly flexible! You can add new key-value pairs, update existing ones, remove items, and search through your data efficiently.</p>
+    
+    <div class="array-examples">
+      <div class="array-card">
+        <h4>➕ Adding and Updating</h4>
+        <div class="code-editor">
+          # Start with basic info<br>
+          student = {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"name": "Emma",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"grade": 11<br>
+          }<br><br>
+          
+          print("Original:", student)<br><br>
+          
+          # Add new information<br>
+          student["age"] = 16<br>
+          student["subjects"] = ["Math", "Science", "English"]<br>
+          student["gpa"] = 3.8<br><br>
+          
+          print("After adding:", student)<br><br>
+          
+          # Update existing information<br>
+          student["grade"] = 12<br>
+          student["gpa"] = 3.9<br><br>
+          
+          print("After updating:", student)
+        </div>
+      </div>
+      
+      <div class="array-card">
+        <h4>🔍 Accessing and Checking</h4>
+        <div class="code-editor">
+          game_stats = {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"player": "Alex",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"score": 1500,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"level": 8,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"lives": 3<br>
+          }<br><br>
+          
+          # Safe access with get()<br>
+          print("Player:", game_stats.get("player"))<br>
+          print("Score:", game_stats.get("score", 0))<br>
+          print("Power:", game_stats.get("power", "None"))<br><br>
+          
+          # Check if key exists<br>
+          if "lives" in game_stats:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print(f"Lives remaining: {game_stats['lives']}")<br><br>
+          
+          # Get all keys and values<br>
+          print("All keys:", list(game_stats.keys()))<br>
+          print("All values:", list(game_stats.values()))
+        </div>
+      </div>
+    </div>
+
+    <div class="array-examples">
+      <div class="array-card">
+        <h4>➖ Removing Items</h4>
+        <div class="code-editor">
+          inventory = {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"sword": 1,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"shield": 1,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"potion": 5,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"key": 2,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"junk": 10<br>
+          }<br><br>
+          
+          print("Before cleanup:", inventory)<br><br>
+          
+          # Remove specific item<br>
+          del inventory["junk"]<br>
+          print("After removing junk:", inventory)<br><br>
+          
+          # Remove and get value<br>
+          used_potions = inventory.pop("potion", 0)<br>
+          print(f"Used {used_potions} potions")<br>
+          print("Final inventory:", inventory)
+        </div>
+      </div>
+      
+      <div class="array-card">
+        <h4>🔄 Iterating Through Data</h4>
+        <div class="code-editor">
+          scores = {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"Alice": 95,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"Bob": 87,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"Charlie": 92,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"Diana": 98<br>
+          }<br><br>
+          
+          # Loop through keys<br>
+          print("Students:")<br>
+          for name in scores:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print(f"- {name}")<br><br>
+          
+          # Loop through key-value pairs<br>
+          print("Scores:")<br>
+          for name, score in scores.items():<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print(f"{name}: {score}%")<br><br>
+          
+          # Find highest score<br>
+          best_student = max(scores, key=scores.get)<br>
+          print(f"Top student: {best_student} ({scores[best_student]}%)")
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <h3>🛠️ Essential Dictionary Methods</h3>
+      <p>• **dict[key] = value**: Add or update<br>
+      • **dict.get(key, default)**: Safe access<br>
+      • **key in dict**: Check if key exists<br>
+      • **del dict[key]**: Remove key-value pair<br>
+      • **dict.pop(key)**: Remove and return value<br>
+      • **dict.keys()**, **dict.values()**, **dict.items()**: Get collections</p>
+    </div>
+
+    <p><strong>🎯 Practice Dictionary Operations!</strong></p>
+    <textarea id="objectCode2" placeholder="Practice working with dictionaries...">print("📱 Social Media Profile Manager")
+print("=" * 40)
+
+# Create a user profile
+profile = {
+    "username": "techgamer2024",
+    "display_name": "Alex Chen",
+    "followers": 1250,
+    "following": 890,
+    "posts": 156,
+    "verified": False
+}
+
+print("Original Profile:")
+for key, value in profile.items():
+    print(f"{key}: {value}")
+
+print("\n📈 Profile Updates:")
+
+# User gains followers and posts more
+profile["followers"] += 50
+profile["posts"] += 3
+profile["bio"] = "Love coding and gaming! 🎮💻"
+
+# User gets verified!
+profile["verified"] = True
+profile["verification_date"] = "2024-01-15"
+
+print("Updated Profile:")
+for key, value in profile.items():
+    print(f"{key}: {value}")
+
+# Calculate engagement metrics
+engagement_rate = (profile["followers"] / profile["posts"]) * 0.1
+profile["engagement_rate"] = round(engagement_rate, 2)
+
+print(f"\n📊 Analytics:")
+print(f"Engagement Rate: {profile['engagement_rate']}%")
+print(f"Follower Growth: +50 this month")
+
+# Check profile completeness
+required_fields = ["username", "display_name", "bio", "verified"]
+missing_fields = []
+
+for field in required_fields:
+    if field not in profile:
+        missing_fields.append(field)
+
+if missing_fields:
+    print(f"⚠️ Missing fields: {missing_fields}")
+else:
+    print("✅ Profile is complete!")
+
+# Create posts dictionary
+posts = {
+    "post_1": {
+        "content": "Just finished my first Python project! 🐍",
+        "likes": 45,
+        "comments": 12,
+        "shares": 3
+    },
+    "post_2": {
+        "content": "Gaming setup tour coming soon! 🎮",
+        "likes": 78,
+        "comments": 23,
+        "shares": 8
+    },
+    "post_3": {
+        "content": "Learning algorithms is fun! 📚",
+        "likes": 34,
+        "comments": 7,
+        "shares": 2
+    }
+}
+
+print(f"\n📝 Recent Posts:")
+total_likes = 0
+for post_id, post_data in posts.items():
+    print(f"• {post_data['content']}")
+    print(f"  💖 {post_data['likes']} likes, 💬 {post_data['comments']} comments")
+    total_likes += post_data['likes']
+
+print(f"\n🎯 Total likes across all posts: {total_likes}")</textarea>
+    <br>
+    <button class="button" onclick="runObjectCode(2)">▶️ Run Code</button>
+    
+    <div id="objectOutput2" class="code-output hidden"></div>
+  </div>
+
+  <div id="objectLesson3" class="hidden">
+    <h3>🎮 Character Stats and Game Data</h3>
+    <p>Dictionaries are perfect for game development! They can represent character stats, inventory items, game settings, and complex data structures that make games dynamic and interesting.</p>
+    
+    <div class="array-examples">
+      <div class="array-card">
+        <h4>⚔️ RPG Character System</h4>
+        <div class="code-editor">
+          # Complete character with nested data<br>
+          character = {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"name": "Aria Stormwind",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"class": "Mage",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"level": 25,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"stats": {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"strength": 12,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"intelligence": 18,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"dexterity": 14,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"constitution": 16<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;},<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"equipment": {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"weapon": "Staff of Lightning",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"armor": "Robes of Protection",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"accessory": "Ring of Mana"<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+          }<br><br>
+          
+          print(f"Character: {character['name']}")<br>
+          print(f"Class: {character['class']} (Level {character['level']})")<br>
+          print(f"Intelligence: {character['stats']['intelligence']}")<br>
+          print(f"Weapon: {character['equipment']['weapon']}")
+        </div>
+      </div>
+      
+      <div class="array-card">
+        <h4>🏆 Achievement System</h4>
+        <div class="code-editor">
+          # Track player achievements<br>
+          achievements = {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"first_kill": {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": "First Blood",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"description": "Defeat your first enemy",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"unlocked": True,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"points": 10<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;},<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"level_10": {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": "Rising Star",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"description": "Reach level 10",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"unlocked": True,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"points": 25<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;},<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"dragon_slayer": {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": "Dragon Slayer",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"description": "Defeat the ancient dragon",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"unlocked": False,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"points": 100<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+          }<br><br>
+          
+          # Calculate total points<br>
+          total_points = 0<br>
+          for achievement in achievements.values():<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;if achievement["unlocked"]:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;total_points += achievement["points"]<br><br>
+          
+          print(f"Achievement Points: {total_points}")
+        </div>
+      </div>
+    </div>
+
+    <h4>🧩 Interactive Challenge: Fix the Character Stats!</h4>
+    <div class="quiz-container">
+      <p><strong>A character's stats are stored incorrectly. Identify the syntax error:</strong></p>
+      <div class="code-editor" style="background: rgba(244, 67, 54, 0.1); border-color: #f44336;">
+        character = {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;"name": "Hero",<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;"level": 5<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;"health": 100,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;"mana": 50<br>
+        }
+      </div>
+      
+      <p>What's wrong with this code?</p>
+      <div class="quiz-option" onclick="selectSyntaxAnswer(this, false)">A) Missing quotes around "Hero"</div>
+      <div class="quiz-option" onclick="selectSyntaxAnswer(this, true)">B) Missing comma after "level": 5</div>
+      <div class="quiz-option" onclick="selectSyntaxAnswer(this, false)">C) Wrong bracket type used</div>
+      <div class="quiz-option" onclick="selectSyntaxAnswer(this, false)">D) "mana" should be a number</div>
+      
+      <div id="syntaxFeedback" style="margin-top: 15px; display: none;"></div>
+    </div>
+
+    <p><strong>🎯 Build a Complete Game Character!</strong></p>
+    <textarea id="objectCode3" placeholder="Create a complex character system...">print("🎮 Advanced RPG Character System")
+print("=" * 45)
+
+# Create a comprehensive character
+character = {
+    "basic_info": {
+        "name": "Zara Nightblade",
+        "class": "Assassin",
+        "level": 18,
+        "experience": 15750,
+        "next_level_xp": 18000
+    },
+    "stats": {
+        "health": 85,
+        "max_health": 100,
+        "mana": 60,
+        "max_mana": 75,
+        "strength": 14,
+        "agility": 20,
+        "intelligence": 12,
+        "luck": 16
+    },
+    "equipment": {
+        "main_hand": "Shadow Dagger",
+        "off_hand": "Poison Blade",
+        "armor": "Leather Armor of Stealth",
+        "boots": "Silent Step Boots",
+        "ring": "Ring of Shadows",
+        "necklace": "Amulet of Night Vision"
+    },
+    "inventory": {
+        "health_potions": 8,
+        "mana_potions": 5,
+        "throwing_knives": 15,
+        "lockpicks": 12,
+        "gold": 2450
+    },
+    "skills": {
+        "stealth": 85,
+        "lockpicking": 78,
+        "backstab": 92,
+        "poison_craft": 65,
+        "acrobatics": 88
+    },
+    "location": {
+        "current": "Thieves' Guild",
+        "region": "Shadow District",
+        "city": "Darkholm"
+    }
+}
+
+# Display character information
+print(f"🗡️ {character['basic_info']['name']}")
+print(f"Class: {character['basic_info']['class']} (Level {character['basic_info']['level']})")
+print(f"Location: {character['location']['current']}, {character['location']['city']}")
+print()
+
+# Health and mana status
+health_percent = (character['stats']['health'] / character['stats']['max_health']) * 100
+mana_percent = (character['stats']['mana'] / character['stats']['max_mana']) * 100
+
+print("📊 Status:")
+print(f"Health: {character['stats']['health']}/{character['stats']['max_health']} ({health_percent:.0f}%)")
+print(f"Mana: {character['stats']['mana']}/{character['stats']['max_mana']} ({mana_percent:.0f}%)")
+print()
+
+# Equipment loadout
+print("⚔️ Equipment:")
+for slot, item in character['equipment'].items():
+    print(f"{slot.replace('_', ' ').title()}: {item}")
+print()
+
+# Top skills
+print("🎯 Top Skills:")
+sorted_skills = sorted(character['skills'].items(), key=lambda x: x[1], reverse=True)
+for skill, level in sorted_skills[:3]:
+    print(f"{skill.replace('_', ' ').title()}: {level}")
+print()
+
+# Inventory summary
+print("🎒 Inventory:")
+for item, quantity in character['inventory'].items():
+    if item == "gold":
+        print(f"💰 {quantity} gold pieces")
+    else:
+        print(f"• {item.replace('_', ' ').title()}: {quantity}")
+print()
+
+# Experience progress
+current_xp = character['basic_info']['experience']
+next_level = character['basic_info']['next_level_xp']
+xp_needed = next_level - current_xp
+xp_progress = (current_xp / next_level) * 100
+
+print("📈 Experience:")
+print(f"Current XP: {current_xp:,}")
+print(f"Next Level: {next_level:,}")
+print(f"XP Needed: {xp_needed:,}")
+print(f"Progress: {xp_progress:.1f}%")
+
+# Character power rating
+def calculate_power_rating(char):
+    stats_total = sum(char['stats'][stat] for stat in ['strength', 'agility', 'intelligence', 'luck'])
+    skills_avg = sum(char['skills'].values()) / len(char['skills'])
+    level_bonus = char['basic_info']['level'] * 10
+    equipment_bonus = len(char['equipment']) * 5
+    
+    return int(stats_total + skills_avg + level_bonus + equipment_bonus)
+
+power_rating = calculate_power_rating(character)
+print(f"\n⚡ Power Rating: {power_rating}")
+
+# Determine character's specialty
+highest_skill = max(character['skills'], key=character['skills'].get)
+highest_skill_value = character['skills'][highest_skill]
+
+print(f"🌟 Specialty: {highest_skill.replace('_', ' ').title()} Master ({highest_skill_value})")
+
+if highest_skill_value >= 90:
+    print("🏆 Legendary skill level achieved!")</textarea>
+    <br>
+    <button class="button" onclick="runObjectCode(3)">▶️ Run Code</button>
+    
+    <div id="objectOutput3" class="code-output hidden"></div>
+  </div>
+
+  <div id="objectLesson4" class="hidden">
+    <h3>🏆 Final Challenge: Complete Data Management System</h3>
+    <p><strong>Mission:</strong> Build a comprehensive student management system using dictionaries and lists!</p>
+    
+    <div class="tip-box">
+      <h3>🎯 Challenge Requirements</h3>
+      <p>Create a system that can:</p>
+      <ul style="text-align: left;">
+        <li>Store student information in nested dictionaries</li>
+        <li>Manage courses, grades, and schedules</li>
+        <li>Calculate GPAs and academic standings</li>
+        <li>Generate detailed reports and analytics</li>
+        <li>Handle multiple students and courses</li>
+        <li>Provide search and filtering capabilities</li>
+      </ul>
+    </div>
+
+    <textarea id="objectCode4" placeholder="Build your student management system here...">class StudentManagementSystem:
+    def __init__(self):
+        self.students = {}
+        self.courses = {}
+        self.enrollments = {}
+    
+    def add_student(self, student_id, name, email, year, major):
+        """Add a new student to the system"""
+        self.students[student_id] = {
+            "name": name,
+            "email": email,
+            "year": year,
+            "major": major,
+            "gpa": 0.0,
+            "credits_completed": 0,
+            "enrollment_date": "2024-01-15",
+            "status": "Active"
+        }
+        self.enrollments[student_id] = {}
+        print(f"✅ Added student: {name} (ID: {student_id})")
+    
+    def add_course(self, course_id, name, credits, instructor, department):
+        """Add a new course to the system"""
+        self.courses[course_id] = {
+            "name": name,
+            "credits": credits,
+            "instructor": instructor,
+            "department": department,
+            "capacity": 30,
+            "enrolled_students": []
+        }
+        print(f"✅ Added course: {name} (ID: {course_id})")
+    
+    def enroll_student(self, student_id, course_id, semester="Fall 2024"):
+        """Enroll a student in a course"""
+        if student_id not in self.students:
+            print(f"❌ Student {student_id} not found")
+            return
+        
+        if course_id not in self.courses:
+            print(f"❌ Course {course_id} not found")
+            return
+        
+        # Add to student's enrollment
+        if course_id not in self.enrollments[student_id]:
+            self.enrollments[student_id][course_id] = {
+                "semester": semester,
+                "grade": None,
+                "status": "Enrolled"
+            }
+            
+            # Add to course's student list
+            self.courses[course_id]["enrolled_students"].append(student_id)
+            
+            student_name = self.students[student_id]["name"]
+            course_name = self.courses[course_id]["name"]
+            print(f"✅ Enrolled {student_name} in {course_name}")
+        else:
+            print(f"⚠️ Student already enrolled in this course")
+    
+    def assign_grade(self, student_id, course_id, grade):
+        """Assign a grade to a student for a course"""
+        if student_id in self.enrollments and course_id in self.enrollments[student_id]:
+            self.enrollments[student_id][course_id]["grade"] = grade
+            self.enrollments[student_id][course_id]["status"] = "Completed"
+            
+            # Update student's GPA and credits
+            self._update_student_gpa(student_id)
+            
+            student_name = self.students[student_id]["name"]
+            course_name = self.courses[course_id]["name"]
+            print(f"✅ Assigned grade {grade} to {student_name} for {course_name}")
+        else:
+            print(f"❌ Enrollment not found")
+    
+    def _update_student_gpa(self, student_id):
+        """Calculate and update student's GPA"""
+        grade_points = {"A": 4.0, "B": 3.0, "C": 2.0, "D": 1.0, "F": 0.0}
+        
+        total_points = 0
+        total_credits = 0
+        
+        for course_id, enrollment in self.enrollments[student_id].items():
+            if enrollment["grade"] and enrollment["status"] == "Completed":
+                credits = self.courses[course_id]["credits"]
+                points = grade_points.get(enrollment["grade"], 0)
+                
+                total_points += points * credits
+                total_credits += credits
+        
+        if total_credits > 0:
+            gpa = total_points / total_credits
+            self.students[student_id]["gpa"] = round(gpa, 2)
+            self.students[student_id]["credits_completed"] = total_credits
+    
+    def get_student_transcript(self, student_id):
+        """Generate a student's transcript"""
+        if student_id not in self.students:
+            return None
+        
+        student = self.students[student_id]
+        transcript = {
+            "student_info": student,
+            "courses": []
+        }
+        
+        for course_id, enrollment in self.enrollments[student_id].items():
+            course = self.courses[course_id]
+            transcript["courses"].append({
+                "course_id": course_id,
+                "course_name": course["name"],
+                "credits": course["credits"],
+                "instructor": course["instructor"],
+                "semester": enrollment["semester"],
+                "grade": enrollment["grade"],
+                "status": enrollment["status"]
+            })
+        
+        return transcript
+    
+    def get_course_roster(self, course_id):
+        """Get list of students enrolled in a course"""
+        if course_id not in self.courses:
+            return None
+        
+        course = self.courses[course_id]
+        roster = {
+            "course_info": course,
+            "students": []
+        }
+        
+        for student_id in course["enrolled_students"]:
+            student = self.students[student_id]
+            enrollment = self.enrollments[student_id][course_id]
+            
+            roster["students"].append({
+                "student_id": student_id,
+                "name": student["name"],
+                "year": student["year"],
+                "major": student["major"],
+                "grade": enrollment["grade"],
+                "status": enrollment["status"]
+            })
+        
+        return roster
+    
+    def generate_academic_report(self):
+        """Generate comprehensive academic report"""
+        print("🎓 ACADEMIC MANAGEMENT SYSTEM REPORT")
+        print("=" * 50)
+        
+        # System overview
+        total_students = len(self.students)
+        total_courses = len(self.courses)
+        total_enrollments = sum(len(enrollments) for enrollments in self.enrollments.values())
+        
+        print(f"📊 System Overview:")
+        print(f"Total Students: {total_students}")
+        print(f"Total Courses: {total_courses}")
+        print(f"Total Enrollments: {total_enrollments}")
+        print()
+        
+        # Student statistics
+        if self.students:
+            gpas = [student["gpa"] for student in self.students.values() if student["gpa"] > 0]
+            if gpas:
+                avg_gpa = sum(gpas) / len(gpas)
+                print(f"📈 Academic Performance:")
+                print(f"Average GPA: {avg_gpa:.2f}")
+                print(f"Highest GPA: {max(gpas):.2f}")
+                print(f"Students with GPA > 3.5: {len([gpa for gpa in gpas if gpa > 3.5])}")
+                print()
+        
+        # Department breakdown
+        departments = {}
+        for course in self.courses.values():
+            dept = course["department"]
+            if dept not in departments:
+                departments[dept] = {"courses": 0, "total_enrollment": 0}
+            departments[dept]["courses"] += 1
+            departments[dept]["total_enrollment"] += len(course["enrolled_students"])
+        
+        print(f"🏫 Department Statistics:")
+        for dept, stats in departments.items():
+            print(f"{dept}: {stats['courses']} courses, {stats['total_enrollment']} enrollments")
+        print()
+        
+        # Top performing students
+        top_students = sorted(
+            [(sid, student) for sid, student in self.students.items() if student["gpa"] > 0],
+            key=lambda x: x[1]["gpa"],
+            reverse=True
+        )[:3]
+        
+        if top_students:
+            print(f"🏆 Top Performing Students:")
+            for i, (student_id, student) in enumerate(top_students, 1):
+                print(f"{i}. {student['name']} - GPA: {student['gpa']:.2f} ({student['major']})")
+
+# Demo the Student Management System
+print("🏫 University Student Management System")
+print("=" * 45)
+
+sms = StudentManagementSystem()
+
+# Add students
+sms.add_student("S001", "Alice Johnson", "alice.j@university.edu", "Sophomore", "Computer Science")
+sms.add_student("S002", "Bob Smith", "bob.s@university.edu", "Junior", "Mathematics")
+sms.add_student("S003", "Carol Davis", "carol.d@university.edu", "Freshman", "Physics")
+sms.add_student("S004", "David Wilson", "david.w@university.edu", "Senior", "Computer Science")
+
+print()
+
+# Add courses
+sms.add_course("CS101", "Introduction to Programming", 3, "Dr. Anderson", "Computer Science")
+sms.add_course("CS201", "Data Structures", 4, "Prof. Martinez", "Computer Science")
+sms.add_course("MATH201", "Calculus II", 4, "Dr. Thompson", "Mathematics")
+sms.add_course("PHYS101", "General Physics", 3, "Prof. Lee", "Physics")
+
+print()
+
+# Enroll students in courses
+sms.enroll_student("S001", "CS101", "Fall 2024")
+sms.enroll_student("S001", "CS201", "Fall 2024")
+sms.enroll_student("S001", "MATH201", "Fall 2024")
+
+sms.enroll_student("S002", "MATH201", "Fall 2024")
+sms.enroll_student("S002", "CS101", "Fall 2024")
+
+sms.enroll_student("S003", "PHYS101", "Fall 2024")
+sms.enroll_student("S003", "MATH201", "Fall 2024")
+
+sms.enroll_student("S004", "CS201", "Fall 2024")
+sms.enroll_student("S004", "CS101", "Fall 2024")
+
+print()
+
+# Assign grades
+sms.assign_grade("S001", "CS101", "A")
+sms.assign_grade("S001", "CS201", "B")
+sms.assign_grade("S001", "MATH201", "A")
+
+sms.assign_grade("S002", "MATH201", "A")
+sms.assign_grade("S002", "CS101", "B")
+
+sms.assign_grade("S003", "PHYS101", "A")
+sms.assign_grade("S003", "MATH201", "C")
+
+sms.assign_grade("S004", "CS201", "A")
+sms.assign_grade("S004", "CS101", "A")
+
+print()
+
+# Generate reports
+sms.generate_academic_report()
+
+print("\n" + "="*50)
+print("📋 Sample Student Transcript:")
+print("="*50)
+
+transcript = sms.get_student_transcript("S001")
+if transcript:
+    student = transcript["student_info"]
+    print(f"Student: {student['name']} (ID: S001)")
+    print(f"Major: {student['major']} | Year: {student['year']}")
+    print(f"GPA: {student['gpa']:.2f} | Credits: {student['credits_completed']}")
+    print(f"Status: {student['status']}")
+    print("\nCourse History:")
+    
+    for course in transcript["courses"]:
+        status_icon = "✅" if course["status"] == "Completed" else "📝"
+        grade_display = course["grade"] if course["grade"] else "In Progress"
+        print(f"{status_icon} {course['course_name']} ({course['course_id']})")
+        print(f"   Credits: {course['credits']} | Grade: {grade_display} | {course['semester']}")
+
+print("\n🎉 Student Management System Demo Complete!")</textarea>
+    <br>
+    <button class="button" onclick="runObjectCode(4)">🚀 Run Management System</button>
+    
+    <div id="objectOutput4" class="code-output hidden"></div>
+  </div>
+</div>
+
+<!-- Result Screen -->
+<div id="endScreen" class="section hidden">
+  <h2>🏁 Outstanding Achievement! 🎉</h2>
+  <p id="resultSummary"></p>
+  <div class="navigation">
+    <button class="button" onclick="goToMenu()">🏠 Main Menu</button>
+    <button class="button" onclick="celebrateCompletion()">🎉 Celebrate!</button>
+  </div>
+</div>
+
+</div>
+
+
+<script>
+// Game State
+let currentSection = 'menu';
+let currentArrayLesson = 1;
+let currentObjectLesson = 1;
+let gameProgress = {
+  arrays: false,
+  objects: false
+};
+
+// Drag and drop state
+let draggedItem = null;
+let listItems = [];
+let matchingPairs = {};
+
+// Initialize game
+window.onload = () => {
+  createStars();
+  updateDisplay();
+  goToMenu();
+  loadProgress();
+  setupDragAndDrop();
+};
+
+function createStars() {
+  const starsContainer = document.getElementById('stars');
+  for (let i = 0; i < 100; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+    star.style.animationDelay = Math.random() * 2 + 's';
+    starsContainer.appendChild(star);
+  }
+}
+
+function updateDisplay() {
+  const totalXP = parseInt(localStorage.getItem("totalXP") || "0");
+  document.getElementById("totalXP").textContent = totalXP;
+  
+  // Calculate progress
+  const completedLevels = Object.values(gameProgress).filter(Boolean).length;
+  const progress = (completedLevels / 2) * 100;
+  
+  document.getElementById("progressFill").style.width = progress + '%';
+  document.getElementById("progressText").textContent = Math.round(progress) + '%';
+  
+  updateLevelCards();
+}
+
+function updateLevelCards() {
+  const cards = ['arraysCard', 'objectsCard'];
+  const levels = ['arrays', 'objects'];
+  
+  cards.forEach((cardId, index) => {
+    const card = document.getElementById(cardId);
+    const level = levels[index];
+    
+    card.classList.remove('completed', 'active');
+    
+    if (gameProgress[level]) {
+      card.classList.add('completed');
+    } else if (currentSection === level) {
+      card.classList.add('active');
+    }
+  });
+}
+
+function goToMenu() {
+  hideAllSections();
+  currentSection = 'menu';
+  updateDisplay();
+}
+
+function goToLevel(level) {
+  currentSection = level;
+  hideAllSections();
+  
+  if (level === 'arrays') {
+    document.getElementById('arraysLevel').classList.remove('hidden');
+    showArrayLesson(1);
+  } else if (level === 'objects') {
+    document.getElementById('objectsLevel').classList.remove('hidden');
+    showObjectLesson(1);
+  }
+  
+  updateDisplay();
+}
+
+function hideAllSections() {
+  document.querySelectorAll(".section").forEach(el => el.classList.add("hidden"));
+}
+
+function showArrayLesson(lessonNum) {
+  // Hide all array lessons
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`arrayLesson${i}`).classList.add('hidden');
+  }
+  
+  // Update tab styles
+  const arrayTabs = document.querySelector('#arraysLevel .lesson-tabs').children;
+  Array.from(arrayTabs).forEach(tab => tab.classList.remove('active'));
+  arrayTabs[lessonNum - 1].classList.add('active');
+  
+  // Show selected lesson
+  document.getElementById(`arrayLesson${lessonNum}`).classList.remove('hidden');
+  currentArrayLesson = lessonNum;
+  
+  // Reset interactive elements for lesson 1
+  if (lessonNum === 1) {
+    resetListBuilder();
+  }
+}
+
+function showObjectLesson(lessonNum) {
+  // Hide all object lessons
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`objectLesson${i}`).classList.add('hidden');
+  }
+  
+  // Update tab styles
+  const objectTabs = document.querySelector('#objectsLevel .lesson-tabs').children;
+  Array.from(objectTabs).forEach(tab => tab.classList.remove('active'));
+  objectTabs[lessonNum - 1].classList.add('active');
+  
+  // Show selected lesson
+  document.getElementById(`objectLesson${lessonNum}`).classList.remove('hidden');
+  currentObjectLesson = lessonNum;
+  
+  // Reset interactive elements for lesson 1
+  if (lessonNum === 1) {
+    resetDictionaryMatcher();
+  }
+}
+
+// Drag and Drop Functionality
+function setupDragAndDrop() {
+  // Setup for list building activity
+  document.addEventListener('dragstart', (e) => {
+    if (e.target.classList.contains('draggable-item')) {
+      draggedItem = e.target;
+      e.target.classList.add('dragging');
+    }
+  });
+  
+  document.addEventListener('dragend', (e) => {
+    if (e.target.classList.contains('draggable-item')) {
+      e.target.classList.remove('dragging');
+      draggedItem = null;
+    }
+  });
+  
+  document.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (e.target.classList.contains('drag-drop-area') || e.target.classList.contains('drop-zone')) {
+      e.target.classList.add('drag-over');
+    }
+  });
+  
+  document.addEventListener('dragleave', (e) => {
+    if (e.target.classList.contains('drag-drop-area') || e.target.classList.contains('drop-zone')) {
+      e.target.classList.remove('drag-over');
+    }
+  });
+  
+  document.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.target.classList.remove('drag-over');
+    
+    if (e.target.classList.contains('drag-drop-area') && draggedItem) {
+      handleListDrop(e.target, draggedItem);
+    } else if (e.target.classList.contains('drop-zone') && draggedItem) {
+      handleDictionaryDrop(e.target, draggedItem);
+    }
+  });
+}
+
+function handleListDrop(dropArea, item) {
+  const value = item.dataset.value;
+  
+  // Add to list if not already there
+  if (!listItems.includes(value)) {
+    listItems.push(value);
+    
+    // Create a copy of the item in the drop area
+    const itemCopy = item.cloneNode(true);
+    itemCopy.draggable = false;
+    itemCopy.style.cursor = 'default';
+    dropArea.appendChild(itemCopy);
+    
+    // Update the list output
+    updateListOutput();
+    
+    // Hide the original item
+    item.style.display = 'none';
+  }
+}
+
+function updateListOutput() {
+  const output = document.getElementById('listOutput');
+  const codeSpan = document.getElementById('listCode');
+  
+  if (listItems.length > 0) {
+    const listString = listItems.map(item => `"${item}"`).join(', ');
+    codeSpan.textContent = `my_list = [${listString}]`;
+    output.style.display = 'block';
+    
+    // Clear placeholder text
+    const container = document.getElementById('listContainer');
+    const placeholder = container.querySelector('p');
+    if (placeholder) {
+      placeholder.style.display = 'none';
+    }
+  }
+}
+
+function resetListBuilder() {
+  listItems = [];
+  const container = document.getElementById('listContainer');
+  const output = document.getElementById('listOutput');
+  
+  // Clear container
+  container.innerHTML = '<p style="color: #888; margin: 0;">Drag items here to build your list!</p>';
+  
+  // Hide output
+  output.style.display = 'none';
+  
+  // Show all draggable items
+  document.querySelectorAll('.draggable-item').forEach(item => {
+    item.style.display = 'inline-block';
+  });
+}
+
+function handleDictionaryDrop(dropZone, item) {
+  const key = dropZone.dataset.key;
+  const value = item.dataset.value;
+  const type = item.dataset.type;
+  
+  // Clear previous content
+  dropZone.innerHTML = '';
+  
+  // Add the dropped item
+  const itemCopy = item.cloneNode(true);
+  itemCopy.draggable = false;
+  itemCopy.style.cursor = 'default';
+  dropZone.appendChild(itemCopy);
+  
+  // Store the pairing
+  matchingPairs[key] = { value, type };
+  
+  // Hide the original item
+  item.style.display = 'none';
+  
+  // Update dictionary output
+  updateDictionaryOutput();
+}
+
+function updateDictionaryOutput() {
+  const output = document.getElementById('matchingResult');
+  const codeSpan = document.getElementById('dictCode');
+  
+  if (Object.keys(matchingPairs).length > 0) {
+    const pairs = Object.entries(matchingPairs)
+      .map(([key, data]) => `"${key}": ${data.type === 'string' ? `"${data.value}"` : data.value}`)
+      .join(', ');
+    
+    codeSpan.textContent = `player = {${pairs}}`;
+    output.style.display = 'block';
+  }
+}
+
+function resetDictionaryMatcher() {
+  matchingPairs = {};
+  
+  // Clear all drop zones
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    zone.innerHTML = zone.dataset.key;
+  });
+  
+  // Hide output
+  const output = document.getElementById('matchingResult');
+  if (output) {
+    output.style.display = 'none';
+  }
+  
+  // Show all draggable items
+  document.querySelectorAll('.draggable-item').forEach(item => {
+    item.style.display = 'inline-block';
+  });
+}
+
+// Quiz Functions
+function selectQuizAnswer(element, isCorrect) {
+  // Disable all options
+  document.querySelectorAll('.quiz-option').forEach(option => {
+    option.style.pointerEvents = 'none';
+    if (option === element) {
+      option.classList.add(isCorrect ? 'correct' : 'incorrect');
+    } else if (!option.classList.contains('correct')) {
+      option.style.opacity = '0.5';
+    }
+  });
+  
+  // Show feedback
+  const feedback = document.getElementById('quizFeedback');
+  feedback.style.display = 'block';
+  feedback.innerHTML = isCorrect 
+    ? '✅ Correct! Remember that indexing starts at 0, so index 2 is the third element.'
+    : '❌ Not quite. Remember that Python uses zero-based indexing, so index 2 refers to the third element.';
+  feedback.style.color = isCorrect ? '#4caf50' : '#f44336';
+}
+
+function selectSyntaxAnswer(element, isCorrect) {
+  // Disable all options
+  document.querySelectorAll('.quiz-option').forEach(option => {
+    option.style.pointerEvents = 'none';
+    if (option === element) {
+      option.classList.add(isCorrect ? 'correct' : 'incorrect');
+    } else if (!option.classList.contains('correct')) {
+      option.style.opacity = '0.5';
+    }
+  });
+  
+  // Show feedback
+  const feedback = document.getElementById('syntaxFeedback');
+  feedback.style.display = 'block';
+  feedback.innerHTML = isCorrect 
+    ? '✅ Correct! Every key-value pair in a dictionary must be followed by a comma, except the last one.'
+    : '❌ Not quite. The error is a missing comma after "level": 5. Each key-value pair needs a comma separator.';
+  feedback.style.color = isCorrect ? '#4caf50' : '#f44336';
+}
+
+// Code execution functions
+function runArrayCode(lessonNum) {
+  const code = document.getElementById(`arrayCode${lessonNum}`).value;
+  const output = document.getElementById(`arrayOutput${lessonNum}`);
+  
+  output.classList.remove('hidden');
+  
+  try {
+    let result = 'Code executed successfully! In a real Python environment, this would show:\n\n';
+    
+    if (code.includes('[') && code.includes(']')) {
+      result += '• List creation and manipulation\n';
+      result += '• Array indexing and slicing\n';
+      result += '• Dynamic list operations\n';
+    }
+    
+    if (lessonNum === 4 && code.includes('class') && code.includes('def')) {
+      result += '\n🎉 Excellent Inventory System! Your program demonstrates:\n';
+      result += '✅ Advanced list management\n';
+      result += '✅ Multiple coordinated arrays\n';
+      result += '✅ Search and filter operations\n';
+      result += '✅ Real-world data processing\n';
+      result += '✅ Object-oriented design\n';
+      
+      gameProgress.arrays = true;
+      const xp = parseInt(localStorage.getItem("totalXP") || "0") + 600;
+      localStorage.setItem("totalXP", xp);
+      saveProgress();
+      updateDisplay();
+    }
+    
+    output.innerHTML = '<strong>🖥️ Output:</strong><br>' + result;
+    
+  } catch (error) {
+    output.innerHTML = `<strong>❌ Error:</strong><br>${error.message}`;
+  }
+}
+
+function runObjectCode(lessonNum) {
+  const code = document.getElementById(`objectCode${lessonNum}`).value;
+  const output = document.getElementById(`objectOutput${lessonNum}`);
+  
+  output.classList.remove('hidden');
+  
+  try {
+    let result = 'Code executed successfully! In a real Python environment, this would show:\n\n';
+    
+    if (code.includes('{') && code.includes('}')) {
+      result += '• Dictionary creation and access\n';
+      result += '• Key-value pair manipulation\n';
+      result += '• Nested data structures\n';
+    }
+    
+    if (lessonNum === 4 && code.includes('class') && code.includes('def')) {
+      result += '\n🎉 Outstanding Management System! Your application demonstrates:\n';
+      result += '✅ Complex dictionary structures\n';
+      result += '✅ Nested data organization\n';
+      result += '✅ Advanced data relationships\n';
+      result += '✅ Professional system design\n';
+      result += '✅ Complete CRUD operations\n';
+      
+      gameProgress.objects = true;
+      const xp = parseInt(localStorage.getItem("totalXP") || "0") + 800;
+      localStorage.setItem("totalXP", xp);
+      saveProgress();
+      updateDisplay();
+      
+      // Check if both levels are complete
+      if (gameProgress.arrays && gameProgress.objects) {
+        setTimeout(() => {
+          showCompletionScreen();
+        }, 2000);
+      }
+    }
+    
+    output.innerHTML = '<strong>🖥️ Output:</strong><br>' + result;
+    
+  } catch (error) {
+    output.innerHTML = `<strong>❌ Error:</strong><br>${error.message}`;
+  }
+}
+
+function showCompletionScreen() {
+  document.getElementById('resultSummary').innerHTML = `
+    <div style="text-align: center; font-size: 18px;">
+      <h3>🏆 LEVELS 7-8 COMPLETED! 🏆</h3>
+      <p>🎉 Congratulations! You've mastered Arrays and Objects!</p>
+      <p><strong>🎓 New Skills Unlocked:</strong></p>
+      <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+        <li>✅ Array/List creation and manipulation</li>
+        <li>✅ Indexing and slicing techniques</li>
+        <li>✅ Dynamic list operations</li>
+        <li>✅ Dictionary/Object fundamentals</li>
+        <li>✅ Key-value pair management</li>
+        <li>✅ Nested data structures</li>
+        <li>✅ Complex data organization</li>
+        <li>✅ Real-world data systems</li>
+      </ul>
+      <p><strong>🌟 Total XP Earned:</strong> ${localStorage.getItem("totalXP") || "0"}</p>
+      <p>🚀 You're now ready for advanced programming concepts!</p>
+    </div>
+  `;
+  
+  hideAllSections();
+  document.getElementById('endScreen').classList.remove('hidden');
+}
+
+function celebrateCompletion() {
+  alert('🎉 Amazing work! You\'ve mastered data structures - the foundation of all programming! 🎉');
+}
+
+function loadProgress() {
+  const saved = localStorage.getItem('gameProgress');
+  if (saved) {
+    const savedProgress = JSON.parse(saved);
+    gameProgress.arrays = savedProgress.arrays || false;
+    gameProgress.objects = savedProgress.objects || false;
+  }
+}
+
+function saveProgress() {
+  localStorage.setItem('gameProgress', JSON.stringify(gameProgress));
+}
+
+// Initialize
+updateDisplay();
+</script>
+<div class="navigation">
+    <button onclick="prevLevel()" class="nav-btn">← level5-6</button>
+    <button onclick="goToMenu()" class="nav-btn">Main Menu</button>
+    <button onclick="window.location.href='levels9-10.html'" class="nav-btn">level9-10 →</button>
+</div>
+</body>
+</html>
