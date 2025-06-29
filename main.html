@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Code Quest: Main Menu</title>
+  <title>Code Quest: Programming Adventure</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,234 +17,731 @@
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
     .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; }
     @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+    
     .menu-container {
       position: relative;
       z-index: 10;
-      max-width: 600px;
+      max-width: 800px;
       margin: 0 auto;
       padding: 40px 20px 80px 20px;
     }
+    
     .title {
-      font-size: 2.5em;
+      font-size: 3em;
       font-weight: bold;
-      margin: 40px 0 16px 0;
+      margin: 40px 0 20px 0;
       letter-spacing: 2px;
+      background: linear-gradient(45deg, #00ffff, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .parts-list {
-      margin: 50px 0 40px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-      align-items: center;
-    }
-    .part-btn {
-      padding: 20px 60px;
+    
+    .subtitle {
       font-size: 1.2em;
-      border-radius: 18px;
-      background: linear-gradient(90deg, #ffd700, #00ffff);
-      color: #222;
-      border: none;
+      color: #00ffff;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+    
+    .parts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+      margin: 50px 0;
+    }
+    
+    .part-card {
+      background: rgba(41, 41, 72, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 20px;
+      border: 2px solid #444;
       cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .part-card:hover {
+      border-color: #00ffff;
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
+    }
+    
+    .part-card.unlocked {
+      border-color: #00ff00;
+    }
+    
+    .part-card.locked {
+      opacity: 0.6;
+      cursor: not-allowed;
+      border-color: #666;
+    }
+    
+    .part-icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+    }
+    
+    .part-title {
+      font-size: 1.4em;
       font-weight: bold;
-      box-shadow: 0 4px 16px rgba(0,255,255,0.13);
-      transition: background 0.3s, color 0.3s, transform 0.2s;
+      margin-bottom: 10px;
     }
-    .part-btn:hover {
-      background: linear-gradient(90deg, #00ffff, #ffd700);
-      color: #111;
-      transform: scale(1.05);
+    
+    .part-description {
+      opacity: 0.8;
+      margin-bottom: 15px;
+      line-height: 1.5;
     }
-    .login-form {
-      background: rgba(0,0,0,0.5);
-      border: 2px solid #00ffff;
-      border-radius: 15px;
-      padding: 18px 30px;
-      max-width: 350px;
-      margin: 30px auto 40px auto;
-      text-align: center;
-    }
-    .login-form input {
-      margin: 8px 0;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid #00ffff;
-      font-size: 1em;
-    }
-    .login-form button {
-      margin-top: 10px;
-      background: linear-gradient(90deg, #00ffff, #ffd700);
-      color: #222;
-      font-weight: bold;
-      border: none;
-      padding: 10px 24px;
+    
+    .part-progress {
+      background: rgba(0, 0, 0, 0.3);
       border-radius: 10px;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background 0.3s;
+      padding: 10px;
+      margin-top: 15px;
     }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      margin: 8px 0;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00ffff, #00ff00);
+      transition: width 0.5s ease;
+      border-radius: 4px;
+    }
+    
+    .part-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9em;
+      margin-top: 10px;
+    }
+    
+    .login-form {
+      background: rgba(0,0,0,0.6);
+      border: 2px solid #00ffff;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      margin: 30px auto;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    
+    .login-form h2 {
+      color: #00ffff;
+      margin-bottom: 20px;
+    }
+    
+    .login-form input {
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 2px solid #00ffff;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+    
+    .login-form input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .login-form button {
+      width: 100%;
+      margin-top: 15px;
+      background: linear-gradient(90deg, #00ffff, #ffd700);
+      color: #222;
+      font-weight: bold;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
     .login-form button:hover {
       background: linear-gradient(90deg, #ffd700, #00ffff);
-      color: #111;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
     }
-    #currentUser {
-      color: #00ffff;
-      font-weight: bold;
-      margin-left: 10px;
-    }
+    
     .hud {
       position: fixed;
-      top: 20px; right: 20px;
-      background: rgba(41, 41, 72, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 15px 25px;
-      border-radius: 15px;
+      top: 20px; 
+      right: 20px;
+      background: rgba(41, 41, 72, 0.95);
+      backdrop-filter: blur(15px);
+      padding: 20px 25px;
+      border-radius: 20px;
       border: 2px solid #00ffff;
       font-weight: bold;
       z-index: 1000;
-      box-shadow: 0 8px 32px rgba(0, 255, 255, 0.3);
-      min-width: 230px;
+      box-shadow: 0 10px 40px rgba(0, 255, 255, 0.3);
+      min-width: 280px;
       text-align: left;
     }
-    @media (max-width: 600px) {
-      .menu-container { padding: 15px 2vw 50px 2vw; }
-      .hud { position: static; margin-bottom: 20px; }
-      .parts-list { gap: 14px; }
-      .part-btn { width: 95%; }
+    
+    .hud-section {
+      margin: 10px 0;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    
+    .hud-section:last-child {
+      border-bottom: none;
+    }
+    
+    .streak-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    
+    .streak-flame {
+      font-size: 1.2em;
+      animation: flicker 1s infinite alternate;
+    }
+    
+    @keyframes flicker {
+      0% { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
+    
+    .achievement-badge {
+      display: inline-block;
+      background: linear-gradient(45deg, #ffd700, #ffed4e);
+      color: #000;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      margin: 2px;
+      font-weight: bold;
+    }
+    
+    .logout-btn {
+      background: rgba(255, 0, 0, 0.2);
+      border: 1px solid #ff4444;
+      color: #ff4444;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(255, 0, 0, 0.4);
+      transform: translateY(-1px);
+    }
+    
+    @media (max-width: 768px) {
+      .menu-container { 
+        padding: 20px 15px 50px 15px; 
+      }
+      .hud { 
+        position: static; 
+        margin: 20px auto;
+        max-width: 350px;
+      }
+      .parts-grid { 
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .title {
+        font-size: 2.2em;
+      }
     }
   </style>
 </head>
 <body>
 <div class="stars" id="stars"></div>
-<div class="hud">
-  <div>🌟 Total XP: <span id="totalXP">0</span></div>
-  <div>🎯 Progress: <span id="progressText">0%</span></div>
-  <div style="margin-top:10px;">
-    👤 User: <span id="currentUser">Not logged in</span>
-    <button onclick="logout()" style="margin-left:10px;padding:4px 12px;font-size:0.95em;border-radius:8px;border:none;background:#222;color:#00ffff;cursor:pointer;">Logout</button>
+
+<div class="hud" id="userHud" style="display:none;">
+  <div class="hud-section">
+    <div>👤 <span id="currentUser">Player</span></div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+  
+  <div class="hud-section">
+    <div>🌟 Total XP: <span id="totalXP">0</span></div>
+    <div>📊 Overall Progress: <span id="overallProgress">0%</span></div>
+  </div>
+  
+  <div class="hud-section">
+    <div class="streak-display">
+      <span class="streak-flame">🔥</span>
+      <span>Streak: <span id="currentStreak">0</span> days</span>
+    </div>
+    <div>🏆 Best Streak: <span id="bestStreak">0</span> days</div>
+  </div>
+  
+  <div class="hud-section">
+    <div>🎯 Accuracy: <span id="overallAccuracy">0%</span></div>
+    <div>⚡ Skill Level: <span id="skillLevel">Beginner</span></div>
+  </div>
+  
+  <div class="hud-section" id="achievementSection" style="display:none;">
+    <div style="font-size: 0.9em; margin-bottom: 5px;">🏅 Recent Achievements:</div>
+    <div id="achievementBadges"></div>
   </div>
 </div>
 
 <!-- Login Form -->
 <div id="loginSection" class="login-form">
-  <h2>Login to Save Progress</h2>
-  <input type="text" id="loginUsername" placeholder="Username"><br>
-  <input type="password" id="loginPassword" placeholder="Password"><br>
-  <button onclick="login()">Login</button>
-  <div id="loginMsg" style="color:#ffd700;margin-top:10px;"></div>
+  <h2>🚀 Join Code Quest</h2>
+  <p style="opacity: 0.8; margin-bottom: 20px;">Create an account or login to save your progress</p>
+  <input type="text" id="loginUsername" placeholder="Choose a username">
+  <input type="password" id="loginPassword" placeholder="Create a password">
+  <button onclick="login()">Start Learning</button>
+  <div id="loginMsg" style="color:#ffd700;margin-top:15px;font-size:0.9em;"></div>
 </div>
 
 <div class="menu-container" id="mainMenuContent" style="display:none;">
-
   <div class="title">Code Quest</div>
-  <div style="font-size:1.15em;color:#00ffff;">Choose your adventure part:</div>
-  <div class="parts-list">
-    <button class="part-btn" onclick="location.href='index.html'">Part One: Beginner & Core</button>
-    <button class="part-btn" id="part2btn" disabled style="opacity:0.6;cursor:not-allowed;">Part Two: Advanced Mastery</button>
-    <button class="part-btn" onclick="partComingSoon('Part Three')">Part Three</button>
-    <button class="part-btn" onclick="partComingSoon('Part Four')">Part Four</button>
+  <div class="subtitle">Master Programming Through Interactive Adventures</div>
+  
+  <div class="parts-grid">
+    <div class="part-card unlocked" onclick="goToPart('beginner')" id="beginnerCard">
+      <div class="part-icon">🌱</div>
+      <div class="part-title">Part 1: Foundation</div>
+      <div class="part-description">
+        Master the fundamentals of programming with Python. Learn variables, loops, functions, and build your first projects.
+      </div>
+      <div class="part-progress">
+        <div>Progress: <span id="part1Progress">0%</span></div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="part1Fill"></div>
+        </div>
+        <div class="part-stats">
+          <span>🎯 <span id="part1Accuracy">0%</span> accuracy</span>
+          <span>⭐ <span id="part1XP">0</span> XP</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="part-card locked" onclick="goToPart('advanced')" id="advancedCard">
+      <div class="part-icon">🚀</div>
+      <div class="part-title">Part 2: Advanced</div>
+      <div class="part-description">
+        Dive into advanced concepts: algorithms, data structures, OOP, web development, and professional coding practices.
+      </div>
+      <div class="part-progress">
+        <div>Progress: <span id="part2Progress">0%</span></div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="part2Fill"></div>
+        </div>
+        <div class="part-stats">
+          <span>🎯 <span id="part2Accuracy">0%</span> accuracy</span>
+          <span>⭐ <span id="part2XP">0</span> XP</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="part-card locked" onclick="partComingSoon('Specialization')" id="specializationCard">
+      <div class="part-icon">🎯</div>
+      <div class="part-title">Part 3: Specialization</div>
+      <div class="part-description">
+        Choose your path: Web Development, Data Science, Game Development, or Mobile Apps. Coming soon!
+      </div>
+      <div class="part-progress">
+        <div style="opacity: 0.6;">Coming Soon</div>
+      </div>
+    </div>
+    
+    <div class="part-card locked" onclick="partComingSoon('Mastery')" id="masteryCard">
+      <div class="part-icon">👑</div>
+      <div class="part-title">Part 4: Mastery</div>
+      <div class="part-description">
+        Advanced projects, open source contributions, and real-world applications. For coding masters!
+      </div>
+      <div class="part-progress">
+        <div style="opacity: 0.6;">Coming Soon</div>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-let currentUser = null;
-let userProgress = {};
-let userXP = 0;
+// Enhanced user progress tracking
+class UserProgressTracker {
+  constructor() {
+    this.currentUser = null;
+    this.userProgress = {};
+    this.userStats = {
+      totalXP: 0,
+      currentStreak: 0,
+      bestStreak: 0,
+      lastLoginDate: null,
+      totalQuestions: 0,
+      correctAnswers: 0,
+      achievements: [],
+      skillLevel: 'Beginner',
+      weakAreas: [],
+      strongAreas: []
+    };
+  }
 
-// Shared login state: store username/password in localStorage, so all pages access
-function setLoginSession(u, p) {
-  localStorage.setItem('cq_current_user', JSON.stringify({username: u, password: p}));
-}
-function getLoginSession() {
-  try {
-    return JSON.parse(localStorage.getItem('cq_current_user'));
-  } catch(e) { return null; }
-}
-function clearLoginSession() {
-  localStorage.removeItem('cq_current_user');
-}
+  // Session management
+  setLoginSession(username, password) {
+    localStorage.setItem('cq_current_user', JSON.stringify({username, password}));
+  }
 
-function login(auto) {
-  let username, password;
-  if (auto) {
-    const session = getLoginSession();
-    if (!session) return;
-    username = session.username;
-    password = session.password;
-  } else {
-    username = document.getElementById('loginUsername').value.trim();
-    password = document.getElementById('loginPassword').value;
-    if (!username || !password) {
-      document.getElementById('loginMsg').textContent = "Enter username and password.";
+  getLoginSession() {
+    try {
+      return JSON.parse(localStorage.getItem('cq_current_user'));
+    } catch(e) { 
+      return null; 
+    }
+  }
+
+  clearLoginSession() {
+    localStorage.removeItem('cq_current_user');
+  }
+
+  // User management
+  login(auto = false) {
+    let username, password;
+    
+    if (auto) {
+      const session = this.getLoginSession();
+      if (!session) return false;
+      username = session.username;
+      password = session.password;
+    } else {
+      username = document.getElementById('loginUsername').value.trim();
+      password = document.getElementById('loginPassword').value;
+      
+      if (!username || !password) {
+        document.getElementById('loginMsg').textContent = "Please enter both username and password.";
+        return false;
+      }
+      
+      if (username.length < 3) {
+        document.getElementById('loginMsg').textContent = "Username must be at least 3 characters.";
+        return false;
+      }
+      
+      this.setLoginSession(username, password);
+    }
+
+    const userKey = `cq_user_${username}_${password}`;
+    let savedData = localStorage.getItem(userKey);
+    
+    if (!savedData) {
+      // New user - initialize progress
+      this.userProgress = {
+        levels12: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
+        levels34: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
+        levels56: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
+        levels78: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
+        levels910: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
+        levels1112: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
+        levels1314: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
+        levels1516: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
+        levels1718: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
+        levels1920: { completed: false, accuracy: 0, attempts: 0, xp: 0 }
+      };
+      
+      this.userStats = {
+        totalXP: 0,
+        currentStreak: 1,
+        bestStreak: 1,
+        lastLoginDate: new Date().toDateString(),
+        totalQuestions: 0,
+        correctAnswers: 0,
+        achievements: ['🎉 Welcome to Code Quest!'],
+        skillLevel: 'Beginner',
+        weakAreas: [],
+        strongAreas: []
+      };
+      
+      this.saveUserData(userKey);
+    } else {
+      const data = JSON.parse(savedData);
+      this.userProgress = data.progress || {};
+      this.userStats = data.stats || this.userStats;
+      
+      // Update streak
+      this.updateStreak();
+    }
+
+    this.currentUser = { username, password, key: userKey };
+    
+    // Show main content
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('mainMenuContent').style.display = '';
+    document.getElementById('userHud').style.display = '';
+    
+    this.updateDisplay();
+    this.checkUnlocks();
+    
+    return true;
+  }
+
+  logout() {
+    this.clearLoginSession();
+    this.currentUser = null;
+    this.userProgress = {};
+    this.userStats = {};
+    
+    document.getElementById('mainMenuContent').style.display = 'none';
+    document.getElementById('userHud').style.display = 'none';
+    document.getElementById('loginSection').style.display = '';
+    
+    // Reset displays
+    document.getElementById('currentUser').textContent = "Not logged in";
+    this.updatePartCards();
+  }
+
+  // Progress tracking
+  updateStreak() {
+    const today = new Date().toDateString();
+    const lastLogin = this.userStats.lastLoginDate;
+    
+    if (lastLogin === today) {
+      // Same day, no change
       return;
     }
-    setLoginSession(username, password);
+    
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (lastLogin === yesterday.toDateString()) {
+      // Consecutive day
+      this.userStats.currentStreak++;
+      this.userStats.bestStreak = Math.max(this.userStats.bestStreak, this.userStats.currentStreak);
+    } else {
+      // Streak broken
+      this.userStats.currentStreak = 1;
+    }
+    
+    this.userStats.lastLoginDate = today;
+    this.saveProgress();
   }
-  const userKey = `cq_user_${username}_${password}`;
-  let saved = localStorage.getItem(userKey);
-  if (!saved) {
-    userProgress = {
-      levels12: false,
-      levels34: false,
-      levels56: false,
-      levels78: false,
-      levels910: false,
-      xp: 0
+
+  addXP(amount, category = 'general') {
+    this.userStats.totalXP += amount;
+    
+    // Update skill level based on XP
+    if (this.userStats.totalXP >= 10000) {
+      this.userStats.skillLevel = 'Master';
+    } else if (this.userStats.totalXP >= 5000) {
+      this.userStats.skillLevel = 'Expert';
+    } else if (this.userStats.totalXP >= 2000) {
+      this.userStats.skillLevel = 'Advanced';
+    } else if (this.userStats.totalXP >= 500) {
+      this.userStats.skillLevel = 'Intermediate';
+    }
+    
+    this.checkAchievements();
+    this.saveProgress();
+  }
+
+  recordAnswer(correct, category) {
+    this.userStats.totalQuestions++;
+    if (correct) {
+      this.userStats.correctAnswers++;
+    }
+    
+    // Track weak/strong areas
+    if (correct) {
+      if (!this.userStats.strongAreas.includes(category)) {
+        this.userStats.strongAreas.push(category);
+      }
+      this.userStats.weakAreas = this.userStats.weakAreas.filter(area => area !== category);
+    } else {
+      if (!this.userStats.weakAreas.includes(category)) {
+        this.userStats.weakAreas.push(category);
+      }
+    }
+    
+    this.saveProgress();
+  }
+
+  checkAchievements() {
+    const achievements = this.userStats.achievements;
+    
+    // XP milestones
+    if (this.userStats.totalXP >= 1000 && !achievements.includes('🌟 First 1000 XP')) {
+      achievements.push('🌟 First 1000 XP');
+    }
+    if (this.userStats.totalXP >= 5000 && !achievements.includes('💎 5000 XP Master')) {
+      achievements.push('💎 5000 XP Master');
+    }
+    
+    // Streak achievements
+    if (this.userStats.currentStreak >= 7 && !achievements.includes('🔥 Week Warrior')) {
+      achievements.push('🔥 Week Warrior');
+    }
+    if (this.userStats.currentStreak >= 30 && !achievements.includes('🏆 Month Master')) {
+      achievements.push('🏆 Month Master');
+    }
+    
+    // Accuracy achievements
+    const accuracy = this.getOverallAccuracy();
+    if (accuracy >= 90 && this.userStats.totalQuestions >= 50 && !achievements.includes('🎯 Precision Pro')) {
+      achievements.push('🎯 Precision Pro');
+    }
+  }
+
+  getOverallAccuracy() {
+    if (this.userStats.totalQuestions === 0) return 0;
+    return Math.round((this.userStats.correctAnswers / this.userStats.totalQuestions) * 100);
+  }
+
+  // Data persistence
+  saveProgress() {
+    if (this.currentUser) {
+      const data = {
+        progress: this.userProgress,
+        stats: this.userStats
+      };
+      localStorage.setItem(this.currentUser.key, JSON.stringify(data));
+    }
+  }
+
+  saveUserData(userKey) {
+    const data = {
+      progress: this.userProgress,
+      stats: this.userStats
     };
-    localStorage.setItem(userKey, JSON.stringify(userProgress));
-  } else {
-    userProgress = JSON.parse(saved);
+    localStorage.setItem(userKey, JSON.stringify(data));
   }
-  currentUser = { username, password, key: userKey };
-  userXP = userProgress.xp || 0;
-  document.getElementById('loginSection').style.display = 'none';
-  document.getElementById('mainMenuContent').style.display = '';
-  document.getElementById('currentUser').textContent = username;
-  updateDisplay();
-  checkPartsUnlock();
-}
-function saveProgress() {
-  if (currentUser) {
-    userProgress.xp = userXP;
-    localStorage.setItem(currentUser.key, JSON.stringify(userProgress));
+
+  // UI Updates
+  updateDisplay() {
+    document.getElementById('currentUser').textContent = this.currentUser.username;
+    document.getElementById('totalXP').textContent = this.userStats.totalXP;
+    document.getElementById('currentStreak').textContent = this.userStats.currentStreak;
+    document.getElementById('bestStreak').textContent = this.userStats.bestStreak;
+    document.getElementById('overallAccuracy').textContent = this.getOverallAccuracy() + '%';
+    document.getElementById('skillLevel').textContent = this.userStats.skillLevel;
+    
+    // Calculate overall progress
+    const completedLevels = Object.values(this.userProgress).filter(level => level.completed).length;
+    const totalLevels = Object.keys(this.userProgress).length;
+    const overallProgress = Math.round((completedLevels / totalLevels) * 100);
+    document.getElementById('overallProgress').textContent = overallProgress + '%';
+    
+    // Update achievements
+    if (this.userStats.achievements.length > 1) {
+      document.getElementById('achievementSection').style.display = '';
+      const badgesHtml = this.userStats.achievements.slice(-3).map(achievement => 
+        `<span class="achievement-badge">${achievement}</span>`
+      ).join('');
+      document.getElementById('achievementBadges').innerHTML = badgesHtml;
+    }
+    
+    this.updatePartCards();
+  }
+
+  updatePartCards() {
+    // Part 1 progress
+    const part1Levels = ['levels12', 'levels34', 'levels56', 'levels78', 'levels910'];
+    const part1Completed = part1Levels.filter(level => this.userProgress[level]?.completed).length;
+    const part1Progress = Math.round((part1Completed / part1Levels.length) * 100);
+    const part1XP = part1Levels.reduce((total, level) => total + (this.userProgress[level]?.xp || 0), 0);
+    const part1Accuracy = this.calculatePartAccuracy(part1Levels);
+    
+    document.getElementById('part1Progress').textContent = part1Progress + '%';
+    document.getElementById('part1Fill').style.width = part1Progress + '%';
+    document.getElementById('part1XP').textContent = part1XP;
+    document.getElementById('part1Accuracy').textContent = part1Accuracy + '%';
+    
+    // Part 2 progress
+    const part2Levels = ['levels1112', 'levels1314', 'levels1516', 'levels1718', 'levels1920'];
+    const part2Completed = part2Levels.filter(level => this.userProgress[level]?.completed).length;
+    const part2Progress = Math.round((part2Completed / part2Levels.length) * 100);
+    const part2XP = part2Levels.reduce((total, level) => total + (this.userProgress[level]?.xp || 0), 0);
+    const part2Accuracy = this.calculatePartAccuracy(part2Levels);
+    
+    document.getElementById('part2Progress').textContent = part2Progress + '%';
+    document.getElementById('part2Fill').style.width = part2Progress + '%';
+    document.getElementById('part2XP').textContent = part2XP;
+    document.getElementById('part2Accuracy').textContent = part2Accuracy + '%';
+  }
+
+  calculatePartAccuracy(levels) {
+    let totalQuestions = 0;
+    let correctAnswers = 0;
+    
+    levels.forEach(level => {
+      if (this.userProgress[level]) {
+        totalQuestions += this.userProgress[level].attempts || 0;
+        correctAnswers += Math.round((this.userProgress[level].accuracy || 0) * (this.userProgress[level].attempts || 0) / 100);
+      }
+    });
+    
+    return totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+  }
+
+  checkUnlocks() {
+    const part1Levels = ['levels12', 'levels34', 'levels56', 'levels78', 'levels910'];
+    const part1Complete = part1Levels.every(level => this.userProgress[level]?.completed);
+    
+    const advancedCard = document.getElementById('advancedCard');
+    if (part1Complete) {
+      advancedCard.classList.remove('locked');
+      advancedCard.classList.add('unlocked');
+      advancedCard.onclick = () => this.goToPart('advanced');
+    } else {
+      advancedCard.classList.add('locked');
+      advancedCard.classList.remove('unlocked');
+      advancedCard.onclick = () => alert('Complete Part 1: Foundation to unlock Advanced levels!');
+    }
+  }
+
+  goToPart(part) {
+    if (part === 'beginner') {
+      window.location.href = 'index.html';
+    } else if (part === 'advanced') {
+      const part1Levels = ['levels12', 'levels34', 'levels56', 'levels78', 'levels910'];
+      const part1Complete = part1Levels.every(level => this.userProgress[level]?.completed);
+      
+      if (part1Complete) {
+        window.location.href = 'index-advanced.html';
+      } else {
+        alert('Complete all Foundation levels first!');
+      }
+    }
   }
 }
+
+// Initialize the progress tracker
+const progressTracker = new UserProgressTracker();
+
+// Global functions for compatibility
+function login(auto) {
+  return progressTracker.login(auto);
+}
+
 function logout() {
-  clearLoginSession();
-  currentUser = null;
-  userProgress = {};
-  userXP = 0;
-  document.getElementById('mainMenuContent').style.display = 'none';
-  document.getElementById('loginSection').style.display = '';
-  document.getElementById('currentUser').textContent = "Not logged in";
-  document.getElementById('part2btn').disabled = true;
-  document.getElementById('part2btn').style.opacity = "0.6";
-  document.getElementById('part2btn').style.cursor = "not-allowed";
+  progressTracker.logout();
 }
+
+function goToPart(part) {
+  progressTracker.goToPart(part);
+}
+
 function partComingSoon(part) {
-  alert(part + " is coming soon!");
+  alert(`${part} is coming soon! 🚀\n\nComplete the current parts to unlock more content.`);
 }
-function updateDisplay() {
-  document.getElementById("totalXP").textContent = userXP || 0;
-  const completedLevels = Object.values(userProgress).filter(Boolean).length - (userProgress.xp !== undefined ? 1 : 0);
-  const progress = (completedLevels / 5) * 100;
-  document.getElementById("progressText").textContent = Math.round(progress) + '%';
-}
-function checkPartsUnlock() {
-  // Only enable Part Two button if all Part One levels are complete
-  const allPart1 = userProgress.levels12 && userProgress.levels34 && userProgress.levels56 && userProgress.levels78 && userProgress.levels910;
-  const part2btn = document.getElementById('part2btn');
-  if (allPart1) {
-    part2btn.disabled = false;
-    part2btn.style.opacity = '';
-    part2btn.style.cursor = '';
-    part2btn.onclick = () => location.href = 'index-advanced.html';
-  } else {
-    part2btn.disabled = true;
-    part2btn.style.opacity = '0.6';
-    part2btn.style.cursor = 'not-allowed';
-    part2btn.onclick = () => alert('Finish all of Part One to unlock Part Two!');
-  }
-}
+
+// Stars animation
 function createStars() {
   const starsContainer = document.getElementById('stars');
   for (let i = 0; i < 100; i++) {
@@ -258,12 +755,14 @@ function createStars() {
   }
 }
 
+// Initialize on page load
 window.onload = function() {
   createStars();
+  
   // Try auto-login if session exists
-  const session = getLoginSession();
+  const session = progressTracker.getLoginSession();
   if (session) {
-    login(true);
+    progressTracker.login(true);
   }
 };
 </script>
