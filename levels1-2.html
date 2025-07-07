@@ -443,7 +443,7 @@
 <!-- Quiz System -->
 <div id="quizContainer" class="quiz-container hidden">
   <div class="question-header">
-    <div class="question-number" id="questionNumber">Question 1 of 10</div>
+    <div class="question-number" id="questionNumber">Question 1 of 12</div>
     <div class="question-text" id="questionText">What is a variable in programming?</div>
   </div>
   
@@ -461,7 +461,7 @@
   </div>
   
   <div style="text-align: center; margin-top: 30px;">
-    <button class="button" id="submitButton" onclick="submitAnswer()" disabled>Submit Answer</button>
+    <button class="button" id="submitButton" onclick="submitAnswer()" disabled>Check Answer</button>
     <button class="button hidden" id="nextButton" onclick="nextQuestion()">Next Question</button>
   </div>
 </div>
@@ -507,11 +507,13 @@
   <a href="levels3-4.html" class="nav-btn">Levels 3-4 →</a>
 </div>
 
+<script src="enhanced-progress-tracker.js"></script>
 <script>
 // Enhanced Question Bank System
 const questionBank = {
   basics: [
     {
+      id: 'var_1',
       type: 'multiple-choice',
       question: 'What is a variable in programming?',
       options: [
@@ -523,9 +525,11 @@ const questionBank = {
       correct: 0,
       explanation: 'A variable is like a labeled box that stores information. You can put data in it, change the contents, and use it throughout your program.',
       category: 'variables',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'variables'
     },
     {
+      id: 'str_1',
       type: 'multiple-choice',
       question: 'Which of these is a string in Python?',
       options: [
@@ -537,9 +541,11 @@ const questionBank = {
       correct: 1,
       explanation: 'Strings are text data wrapped in quotes. "Hello World" is a string because it\'s text enclosed in double quotes.',
       category: 'data-types',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'strings'
     },
     {
+      id: 'debug_1',
       type: 'multiple-choice',
       question: 'What does "debug" mean in programming?',
       options: [
@@ -551,47 +557,169 @@ const questionBank = {
       correct: 1,
       explanation: 'Debugging is the process of finding and fixing errors (bugs) in your code. It\'s an essential skill for all programmers.',
       category: 'debugging',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'debugging'
     },
     {
+      id: 'var_2',
       type: 'fill-in-blank',
       question: 'Complete the code: name = _____',
       options: ['"Alice"', '42', 'True', 'name'],
       correct: 0,
       explanation: 'To store a name (text), we use a string which must be enclosed in quotes.',
       category: 'variables',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'variables'
     },
     {
+      id: 'var_3',
       type: 'code-completion',
       question: 'Complete this code to create a variable that stores your age:',
       template: '_____ = 16',
       answer: 'age',
       explanation: 'Variable names should be descriptive. "age" is a good name for storing someone\'s age.',
       category: 'variables',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'variables'
+    },
+    {
+      id: 'alg_1',
+      type: 'multiple-choice',
+      question: 'What is an algorithm?',
+      options: [
+        'A step-by-step solution to a problem',
+        'A type of variable',
+        'A programming language',
+        'A computer virus'
+      ],
+      correct: 0,
+      explanation: 'An algorithm is a clear set of instructions that solve a problem step by step.',
+      category: 'algorithms',
+      difficulty: 'easy',
+      topic: 'algorithms'
+    },
+    {
+      id: 'data_1',
+      type: 'multiple-choice',
+      question: 'Which of these is NOT a data type?',
+      options: [
+        'String',
+        'Integer',
+        'Boolean',
+        'Algorithm'
+      ],
+      correct: 3,
+      explanation: 'Algorithm is a process, not a data type. String, Integer, and Boolean are all data types.',
+      category: 'data-types',
+      difficulty: 'medium',
+      topic: 'data-types'
+    },
+    {
+      id: 'var_4',
+      type: 'multiple-choice',
+      question: 'What makes a good variable name?',
+      options: [
+        'Short and cryptic like "x"',
+        'Descriptive and meaningful like "student_age"',
+        'Using special characters like "@#$"',
+        'All capital letters like "NAME"'
+      ],
+      correct: 1,
+      explanation: 'Good variable names are descriptive and tell you what the variable stores.',
+      category: 'variables',
+      difficulty: 'medium',
+      topic: 'variables'
+    },
+    {
+      id: 'prob_1',
+      type: 'multiple-choice',
+      question: 'What is the first step in solving a programming problem?',
+      options: [
+        'Start coding immediately',
+        'Understand the problem',
+        'Choose a programming language',
+        'Test the solution'
+      ],
+      correct: 1,
+      explanation: 'Always understand the problem first before writing any code.',
+      category: 'problem-solving',
+      difficulty: 'easy',
+      topic: 'problem-solving'
+    },
+    {
+      id: 'str_2',
+      type: 'multiple-choice',
+      question: 'How do you include quotes inside a string?',
+      options: [
+        'You cannot include quotes',
+        'Use escape characters like \\"',
+        'Use only single quotes',
+        'Use only double quotes'
+      ],
+      correct: 1,
+      explanation: 'Use escape characters (\\") to include quotes inside strings.',
+      category: 'strings',
+      difficulty: 'hard',
+      topic: 'strings'
+    },
+    {
+      id: 'concept_1',
+      type: 'multiple-choice',
+      question: 'What is pseudocode?',
+      options: [
+        'Fake code that doesn\'t work',
+        'Code written in a specific language',
+        'Plain language description of an algorithm',
+        'Code with errors'
+      ],
+      correct: 2,
+      explanation: 'Pseudocode is a way to plan your program using plain language before writing actual code.',
+      category: 'algorithms',
+      difficulty: 'medium',
+      topic: 'algorithms'
+    },
+    {
+      id: 'think_1',
+      type: 'multiple-choice',
+      question: 'What is computational thinking?',
+      options: [
+        'Thinking like a computer',
+        'Breaking down problems into smaller parts',
+        'Memorizing code',
+        'Typing very fast'
+      ],
+      correct: 1,
+      explanation: 'Computational thinking involves breaking complex problems into smaller, manageable parts.',
+      category: 'problem-solving',
+      difficulty: 'medium',
+      topic: 'problem-solving'
     }
   ],
   
   python: [
     {
+      id: 'print_1',
       type: 'multiple-choice',
       question: 'Which function is used to display text in Python?',
       options: ['show()', 'print()', 'display()', 'write()'],
       correct: 1,
       explanation: 'The print() function is Python\'s way to display text and values on the screen.',
       category: 'functions',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'functions'
     },
     {
+      id: 'code_1',
       type: 'code-writing',
       question: 'Write a Python statement to print "Hello, Python!"',
       answer: 'print("Hello, Python!")',
       explanation: 'Use the print() function with the text in quotes to display messages.',
       category: 'functions',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'functions'
     },
     {
+      id: 'print_2',
       type: 'multiple-choice',
       question: 'What will this code output?\nprint("Python", "is", "awesome")',
       options: [
@@ -603,31 +731,132 @@ const questionBank = {
       correct: 0,
       explanation: 'When you separate items with commas in print(), Python automatically adds spaces between them.',
       category: 'functions',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'functions'
     },
     {
+      id: 'input_1',
       type: 'code-completion',
       question: 'Complete this code to get user input:\nname = _____()',
       template: 'name = _____()',
       answer: 'input',
       explanation: 'The input() function is used to get text input from the user.',
       category: 'input',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'input'
     },
     {
+      id: 'debug_2',
       type: 'debugging',
       question: 'Fix this code:\nprint(Hello World)',
       answer: 'print("Hello World")',
       explanation: 'Strings must be enclosed in quotes. The correct syntax is print("Hello World").',
       category: 'syntax',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'syntax'
+    },
+    {
+      id: 'var_py_1',
+      type: 'multiple-choice',
+      question: 'How do you create a variable in Python?',
+      options: [
+        'var name = "Alice"',
+        'name = "Alice"',
+        'create name = "Alice"',
+        'variable name = "Alice"'
+      ],
+      correct: 1,
+      explanation: 'In Python, you create variables by simply assigning a value: name = "Alice"',
+      category: 'variables',
+      difficulty: 'easy',
+      topic: 'variables'
+    },
+    {
+      id: 'input_2',
+      type: 'multiple-choice',
+      question: 'What data type does input() always return?',
+      options: ['integer', 'float', 'string', 'boolean'],
+      correct: 2,
+      explanation: 'input() always returns a string, even if the user enters numbers.',
+      category: 'input',
+      difficulty: 'medium',
+      topic: 'input'
+    },
+    {
+      id: 'print_3',
+      type: 'code-writing',
+      question: 'Write code to print your name and age on separate lines',
+      answer: 'print("Your Name")\nprint("Your Age")',
+      explanation: 'Use separate print() statements for each line of output.',
+      category: 'functions',
+      difficulty: 'medium',
+      topic: 'functions'
+    },
+    {
+      id: 'var_py_2',
+      type: 'multiple-choice',
+      question: 'What will this code do?\nx = 5\nprint(x)',
+      options: [
+        'Print the letter x',
+        'Print the number 5',
+        'Cause an error',
+        'Print x5'
+      ],
+      correct: 1,
+      explanation: 'The variable x stores the value 5, so print(x) displays 5.',
+      category: 'variables',
+      difficulty: 'easy',
+      topic: 'variables'
+    },
+    {
+      id: 'comment_1',
+      type: 'multiple-choice',
+      question: 'How do you write a comment in Python?',
+      options: [
+        '// This is a comment',
+        '/* This is a comment */',
+        '# This is a comment',
+        '<!-- This is a comment -->'
+      ],
+      correct: 2,
+      explanation: 'Python uses # for single-line comments.',
+      category: 'syntax',
+      difficulty: 'easy',
+      topic: 'syntax'
+    },
+    {
+      id: 'input_3',
+      type: 'code-writing',
+      question: 'Write code to ask for the user\'s favorite color and store it',
+      answer: 'color = input("What is your favorite color? ")',
+      explanation: 'Use input() with a prompt message to ask for user input.',
+      category: 'input',
+      difficulty: 'medium',
+      topic: 'input'
+    },
+    {
+      id: 'error_1',
+      type: 'multiple-choice',
+      question: 'What type of error is this?\nprint("Hello"',
+      options: [
+        'Logic error',
+        'Syntax error',
+        'Runtime error',
+        'No error'
+      ],
+      correct: 1,
+      explanation: 'Missing closing parenthesis is a syntax error - the code structure is incorrect.',
+      category: 'debugging',
+      difficulty: 'medium',
+      topic: 'debugging'
     }
   ]
 };
 
-// Enhanced Learning System
-class AdaptiveLearningSystem {
+// Enhanced Learning System with Adaptive Features
+class EnhancedLearningSystem {
   constructor() {
+    this.progressTracker = new EnhancedProgressTracker();
     this.currentLevel = null;
     this.currentQuestionIndex = 0;
     this.questions = [];
@@ -635,10 +864,11 @@ class AdaptiveLearningSystem {
     this.hearts = 5;
     this.score = 0;
     this.correctAnswers = 0;
-    this.weakAreas = new Set();
-    this.strongAreas = new Set();
     this.selectedAnswer = null;
     this.hasAnswered = false;
+    this.questionStartTime = null;
+    this.consecutiveCorrect = 0;
+    this.consecutiveIncorrect = 0;
   }
 
   startLevel(levelKey) {
@@ -648,11 +878,12 @@ class AdaptiveLearningSystem {
     this.hearts = 5;
     this.score = 0;
     this.correctAnswers = 0;
-    this.weakAreas.clear();
-    this.strongAreas.clear();
+    this.consecutiveCorrect = 0;
+    this.consecutiveIncorrect = 0;
     
-    // Get questions for this level
-    this.questions = this.selectQuestions(levelKey);
+    // Get adaptive questions based on user's mistake patterns
+    const allQuestions = questionBank[levelKey] || [];
+    this.questions = this.progressTracker.getAdaptiveQuestions(allQuestions, 12);
     
     // Show quiz container
     document.getElementById('quizContainer').classList.remove('hidden');
@@ -660,38 +891,6 @@ class AdaptiveLearningSystem {
     
     this.displayQuestion();
     this.updateHUD();
-  }
-
-  selectQuestions(levelKey) {
-    const allQuestions = questionBank[levelKey] || [];
-    
-    // Adaptive selection based on user performance
-    let selectedQuestions = [];
-    
-    // Always include some easy questions
-    const easyQuestions = allQuestions.filter(q => q.difficulty === 'easy');
-    selectedQuestions.push(...this.shuffleArray(easyQuestions).slice(0, 3));
-    
-    // Add medium questions
-    const mediumQuestions = allQuestions.filter(q => q.difficulty === 'medium');
-    selectedQuestions.push(...this.shuffleArray(mediumQuestions).slice(0, 4));
-    
-    // Add hard questions if user is performing well
-    const hardQuestions = allQuestions.filter(q => q.difficulty === 'hard');
-    if (hardQuestions.length > 0) {
-      selectedQuestions.push(...this.shuffleArray(hardQuestions).slice(0, 2));
-    }
-    
-    return this.shuffleArray(selectedQuestions).slice(0, 8);
-  }
-
-  shuffleArray(array) {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
   }
 
   displayQuestion() {
@@ -703,10 +902,10 @@ class AdaptiveLearningSystem {
     const question = this.questions[this.currentQuestionIndex];
     this.selectedAnswer = null;
     this.hasAnswered = false;
+    this.questionStartTime = Date.now();
 
-    // Update question header
-    document.getElementById('questionNumber').textContent = 
-      `Question ${this.currentQuestionIndex + 1} of ${this.questions.length}`;
+    // Update question display
+    document.getElementById('questionNumber').textContent = `Question ${this.currentQuestionIndex + 1} of ${this.questions.length}`;
     document.getElementById('questionText').textContent = question.question;
 
     // Clear previous content
@@ -726,6 +925,7 @@ class AdaptiveLearningSystem {
 
     switch (question.type) {
       case 'multiple-choice':
+      case 'fill-in-blank':
         question.options.forEach((option, index) => {
           const button = document.createElement('button');
           button.className = 'option-button';
@@ -736,6 +936,7 @@ class AdaptiveLearningSystem {
         break;
 
       case 'code-writing':
+      case 'debugging':
         const textarea = document.createElement('textarea');
         textarea.className = 'code-input';
         textarea.placeholder = 'Write your Python code here...';
@@ -752,32 +953,6 @@ class AdaptiveLearningSystem {
         codeDiv.innerHTML = question.template.replace('_____', 
           '<input type="text" style="background: #333; border: 1px solid #00ffff; color: white; padding: 5px; border-radius: 5px;" oninput="learningSystem.handleCodeInput(this.value)">');
         contentContainer.appendChild(codeDiv);
-        break;
-
-      case 'debugging':
-        const buggyCode = document.createElement('div');
-        buggyCode.className = 'code-question';
-        buggyCode.innerHTML = `<strong>Buggy Code:</strong><br>${question.question.split('\n')[1]}`;
-        contentContainer.appendChild(buggyCode);
-
-        const fixTextarea = document.createElement('textarea');
-        fixTextarea.className = 'code-input';
-        fixTextarea.placeholder = 'Write the corrected code here...';
-        fixTextarea.oninput = () => {
-          this.selectedAnswer = fixTextarea.value.trim();
-          document.getElementById('submitButton').disabled = !this.selectedAnswer;
-        };
-        contentContainer.appendChild(fixTextarea);
-        break;
-
-      case 'fill-in-blank':
-        question.options.forEach((option, index) => {
-          const button = document.createElement('button');
-          button.className = 'option-button';
-          button.textContent = option;
-          button.onclick = () => this.selectOption(index);
-          optionsContainer.appendChild(button);
-        });
         break;
     }
   }
@@ -805,6 +980,7 @@ class AdaptiveLearningSystem {
     if (this.hasAnswered || this.selectedAnswer === null) return;
 
     const question = this.questions[this.currentQuestionIndex];
+    const timeSpent = (Date.now() - this.questionStartTime) / 1000;
     let isCorrect = false;
 
     // Check answer based on question type
@@ -825,26 +1001,47 @@ class AdaptiveLearningSystem {
     }
 
     this.hasAnswered = true;
-    this.processAnswer(isCorrect, question);
+    this.processAnswer(isCorrect, question, timeSpent);
   }
 
   checkCodeAnswer(userAnswer, correctAnswer) {
-    // Normalize both answers for comparison
     const normalize = (code) => code.toLowerCase().replace(/\s+/g, ' ').trim();
-    return normalize(userAnswer) === normalize(correctAnswer);
+    return normalize(userAnswer).includes(normalize(correctAnswer)) || 
+           normalize(correctAnswer).includes(normalize(userAnswer));
   }
 
-  processAnswer(isCorrect, question) {
+  processAnswer(isCorrect, question, timeSpent) {
+    // Save individual answer
+    this.progressTracker.saveAnswer(
+      question.id, 
+      isCorrect, 
+      question.topic, 
+      question.difficulty, 
+      timeSpent, 
+      'levels1-2'
+    );
+
     // Update statistics
     if (isCorrect) {
       this.correctAnswers++;
-      this.score += this.calculatePoints(question.difficulty);
-      this.strongAreas.add(question.category);
+      this.score += this.calculateScore(question.difficulty, timeSpent);
+      this.consecutiveCorrect++;
+      this.consecutiveIncorrect = 0;
+      
+      // Update quest progress
+      this.progressTracker.updateQuestProgress('accuracy', 1);
+      if (timeSpent < 15) {
+        this.progressTracker.updateQuestProgress('speed', 1);
+      }
     } else {
       this.hearts = Math.max(0, this.hearts - 1);
-      this.weakAreas.add(question.category);
+      this.consecutiveIncorrect++;
+      this.consecutiveCorrect = 0;
     }
 
+    // Adaptive feedback
+    this.showAdaptiveFeedback(isCorrect, question);
+    
     // Show feedback
     this.showFeedback(isCorrect, question);
     
@@ -866,9 +1063,31 @@ class AdaptiveLearningSystem {
     }
   }
 
-  calculatePoints(difficulty) {
-    const points = { easy: 10, medium: 20, hard: 30 };
-    return points[difficulty] || 10;
+  showAdaptiveFeedback(isCorrect, question) {
+    let message = '';
+    
+    if (this.consecutiveCorrect >= 3) {
+      message = '🚀 You\'re on fire! Great job with these concepts!';
+    } else if (this.consecutiveIncorrect >= 2) {
+      message = '📚 Let\'s slow down and review this topic more carefully.';
+    } else if (isCorrect && this.progressTracker.userStats.weakAreas[question.topic]) {
+      message = '💪 Excellent! You\'re improving in this area!';
+    }
+    
+    if (message) {
+      this.progressTracker.showAchievement(message);
+    }
+  }
+
+  calculateScore(difficulty, timeSpent) {
+    const points = { easy: 10, medium: 20, hard: 35 };
+    let basePoints = points[difficulty] || 10;
+    
+    // Time bonus
+    if (timeSpent < 10) basePoints *= 1.5;
+    else if (timeSpent < 20) basePoints *= 1.2;
+    
+    return Math.round(basePoints);
   }
 
   showFeedback(isCorrect, question) {
@@ -876,13 +1095,12 @@ class AdaptiveLearningSystem {
     const feedbackText = document.getElementById('feedbackText');
     const explanationText = document.getElementById('explanationText');
 
-    container.classList.remove('hidden', 'feedback-correct', 'feedback-incorrect');
+    container.className = `feedback-container ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}`;
+    container.classList.remove('hidden');
     
     if (isCorrect) {
-      container.classList.add('feedback-correct');
-      feedbackText.textContent = '✅ Correct! Well done!';
+      feedbackText.textContent = '✅ Excellent! You got it right!';
     } else {
-      container.classList.add('feedback-incorrect');
       feedbackText.textContent = '❌ Not quite right. Let\'s learn from this!';
     }
 
@@ -924,6 +1142,9 @@ class AdaptiveLearningSystem {
     const progress = ((this.currentQuestionIndex + 1) / this.questions.length) * 100;
     document.getElementById('progressFill').style.width = progress + '%';
     document.getElementById('progressText').textContent = Math.round(progress) + '%';
+    
+    // Update XP display
+    document.getElementById('totalXP').textContent = this.progressTracker.userStats.totalXP;
   }
 
   completeLesson() {
@@ -939,23 +1160,22 @@ class AdaptiveLearningSystem {
     document.getElementById('finalStreak').textContent = streak;
 
     // Show weak areas if any
-    if (this.weakAreas.size > 0) {
+    const weakAreas = Object.keys(this.progressTracker.userStats.weakAreas);
+    if (weakAreas.length > 0) {
       document.getElementById('weakAreasDisplay').classList.remove('hidden');
       const weakAreasList = document.getElementById('weakAreasList');
-      weakAreasList.innerHTML = Array.from(this.weakAreas)
+      weakAreasList.innerHTML = weakAreas
         .map(area => `<span style="background: rgba(255,68,68,0.2); padding: 5px 10px; border-radius: 15px; margin: 5px; display: inline-block;">${area}</span>`)
         .join('');
     }
 
-    // Update global progress if available
-    if (window.progressTracker) {
-      window.progressTracker.updateLevelProgress(
-        `levels12`, 
-        this.correctAnswers, 
-        this.questions.length, 
-        xpEarned
-      );
-    }
+    // Update global progress
+    this.progressTracker.updateLevelProgress(
+      'levels12', 
+      this.correctAnswers, 
+      this.questions.length, 
+      xpEarned
+    );
 
     // Show completion screen
     document.getElementById('quizContainer').classList.add('hidden');
@@ -975,7 +1195,7 @@ class AdaptiveLearningSystem {
 }
 
 // Initialize the learning system
-const learningSystem = new AdaptiveLearningSystem();
+const learningSystem = new EnhancedLearningSystem();
 
 // Global functions
 function startLevel(levelKey) {
@@ -991,7 +1211,7 @@ function nextQuestion() {
 }
 
 function goToMenu() {
-  window.location.href = 'index.html';
+  window.location.href = 'main.html';
 }
 
 function retryLesson() {
@@ -1020,13 +1240,10 @@ function createStars() {
 window.onload = function() {
   createStars();
   
-  // Load user progress if available
-  if (window.progressTracker) {
-    // Auto-login if session exists
-    const session = window.progressTracker.getLoginSession();
-    if (session) {
-      window.progressTracker.login(true);
-    }
+  // Auto-login if session exists
+  const session = learningSystem.progressTracker.getLoginSession();
+  if (session) {
+    learningSystem.progressTracker.login(true);
   }
 };
 </script>

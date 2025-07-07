@@ -460,7 +460,7 @@
   </div>
   
   <div style="text-align: center; margin-top: 30px;">
-    <button class="button" id="submitButton" onclick="submitAnswer()" disabled>Submit Answer</button>
+    <button class="button" id="submitButton" onclick="submitAnswer()" disabled>Check Answer</button>
     <button class="button hidden" id="nextButton" onclick="nextQuestion()">Next Question</button>
   </div>
 </div>
@@ -506,168 +506,274 @@
   <a href="levels5-6.html" class="nav-btn">Levels 5-6 →</a>
 </div>
 
+<script src="enhanced-progress-tracker.js"></script>
 <script>
 // Enhanced Question Bank for Math & Decision Making
 const questionBank = {
   math: [
     {
+      id: 'math_1',
       type: 'multiple-choice',
       question: 'What operator is used for addition in Python?',
       options: ['+', '-', '*', '/'],
       correct: 0,
       explanation: 'The + operator is used for addition in Python. For example: 5 + 3 = 8',
       category: 'operators',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'operators'
     },
     {
+      id: 'math_2',
       type: 'multiple-choice',
       question: 'What will 10 / 3 return in Python?',
       options: ['3', '3.33', '3.3333333333333335', '4'],
       correct: 2,
       explanation: 'Division (/) in Python returns a float with full precision, so 10/3 gives 3.3333333333333335',
       category: 'operators',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'operators'
     },
     {
+      id: 'math_3',
       type: 'code-writing',
       question: 'Write Python code to calculate the area of a rectangle with length 8 and width 5:',
       answer: 'area = 8 * 5',
       explanation: 'Area of rectangle = length × width, so area = 8 * 5 = 40',
       category: 'calculations',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'calculations'
     },
     {
+      id: 'math_4',
       type: 'multiple-choice',
       question: 'What does the ** operator do in Python?',
       options: ['Multiplication', 'Division', 'Exponentiation', 'Modulo'],
       correct: 2,
       explanation: 'The ** operator is used for exponentiation (power). For example: 2**3 = 8',
       category: 'operators',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'operators'
     },
     {
+      id: 'math_5',
       type: 'code-completion',
       question: 'Complete the code to find the remainder when 17 is divided by 5:\nremainder = 17 _____ 5',
       template: 'remainder = 17 _____ 5',
       answer: '%',
       explanation: 'The % operator (modulo) gives the remainder of division. 17 % 5 = 2',
       category: 'operators',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'operators'
     },
     {
+      id: 'math_6',
       type: 'debugging',
       question: 'Fix this code to calculate compound interest:\nfinal_amount = 1000 * (1 + 0.05) * 3',
       answer: 'final_amount = 1000 * (1 + 0.05) ** 3',
       explanation: 'Compound interest uses exponentiation (**), not multiplication (*). The formula is P(1+r)^t',
       category: 'calculations',
-      difficulty: 'hard'
+      difficulty: 'hard',
+      topic: 'calculations'
     },
     {
+      id: 'math_7',
       type: 'multiple-choice',
       question: 'What is the result of 15 // 4 in Python?',
       options: ['3', '3.75', '4', '3.0'],
       correct: 0,
       explanation: 'The // operator performs floor division, returning only the whole number part. 15 // 4 = 3',
       category: 'operators',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'operators'
     },
     {
+      id: 'math_8',
       type: 'code-writing',
       question: 'Write code to convert temperature from Celsius to Fahrenheit (formula: F = C * 9/5 + 32):',
       answer: 'fahrenheit = celsius * 9/5 + 32',
       explanation: 'The temperature conversion formula is F = C × 9/5 + 32',
       category: 'calculations',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'calculations'
+    },
+    {
+      id: 'math_9',
+      type: 'multiple-choice',
+      question: 'What will this code output?\nprint(2 ** 3 + 1)',
+      options: ['7', '9', '8', '6'],
+      correct: 1,
+      explanation: '2 ** 3 = 8, then 8 + 1 = 9. Exponentiation has higher precedence than addition.',
+      category: 'operators',
+      difficulty: 'medium',
+      topic: 'operators'
+    },
+    {
+      id: 'math_10',
+      type: 'code-writing',
+      question: 'Write code to calculate the average of three numbers: 10, 20, 30',
+      answer: 'average = (10 + 20 + 30) / 3',
+      explanation: 'Average = sum of all numbers divided by count of numbers',
+      category: 'calculations',
+      difficulty: 'easy',
+      topic: 'calculations'
+    },
+    {
+      id: 'math_11',
+      type: 'multiple-choice',
+      question: 'What is the order of operations in Python?',
+      options: [
+        'Left to right',
+        'Parentheses, Exponents, Multiplication/Division, Addition/Subtraction',
+        'Addition first, then everything else',
+        'Random order'
+      ],
+      correct: 1,
+      explanation: 'Python follows PEMDAS: Parentheses, Exponents, Multiplication/Division (left to right), Addition/Subtraction (left to right)',
+      category: 'operators',
+      difficulty: 'hard',
+      topic: 'operators'
+    },
+    {
+      id: 'math_12',
+      type: 'code-completion',
+      question: 'Complete the code to calculate the square of a number:\nsquare = number _____ 2',
+      template: 'square = number _____ 2',
+      answer: '**',
+      explanation: 'Use ** for exponentiation. number ** 2 calculates the square of the number.',
+      category: 'operators',
+      difficulty: 'easy',
+      topic: 'operators'
     }
   ],
   
   decisions: [
     {
+      id: 'dec_1',
       type: 'multiple-choice',
       question: 'Which keyword is used to start a conditional statement in Python?',
       options: ['when', 'if', 'check', 'condition'],
       correct: 1,
       explanation: 'The "if" keyword is used to start conditional statements in Python.',
       category: 'conditionals',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'conditionals'
     },
     {
+      id: 'dec_2',
       type: 'multiple-choice',
       question: 'What will this code print?\nage = 16\nif age >= 18:\n    print("Adult")\nelse:\n    print("Minor")',
       options: ['Adult', 'Minor', 'Error', 'Nothing'],
       correct: 1,
       explanation: 'Since 16 is less than 18, the condition is False, so "Minor" is printed.',
       category: 'conditionals',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'conditionals'
     },
     {
+      id: 'dec_3',
       type: 'code-completion',
       question: 'Complete the code to check if a number is positive:\nif number _____ 0:\n    print("Positive")',
       template: 'if number _____ 0:',
       answer: '>',
       explanation: 'Use the > operator to check if a number is greater than 0 (positive).',
       category: 'comparisons',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'comparisons'
     },
     {
+      id: 'dec_4',
       type: 'multiple-choice',
       question: 'Which operator checks if two values are equal?',
       options: ['=', '==', '!=', '==='],
       correct: 1,
       explanation: 'The == operator checks equality. = is for assignment, != is for not equal.',
       category: 'comparisons',
-      difficulty: 'easy'
+      difficulty: 'easy',
+      topic: 'comparisons'
     },
     {
+      id: 'dec_5',
       type: 'code-writing',
       question: 'Write an if statement to check if a score is 90 or above for an A grade:',
       answer: 'if score >= 90:\n    print("A grade")',
       explanation: 'Use >= to check if score is greater than or equal to 90.',
       category: 'conditionals',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'conditionals'
     },
     {
+      id: 'dec_6',
       type: 'multiple-choice',
       question: 'What does elif stand for?',
       options: ['else if', 'end if', 'equal if', 'error if'],
       correct: 0,
       explanation: 'elif is short for "else if" and allows checking multiple conditions.',
       category: 'conditionals',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'conditionals'
     },
     {
+      id: 'dec_7',
       type: 'debugging',
       question: 'Fix this code:\nif temperature = 100:\n    print("Boiling point")',
       answer: 'if temperature == 100:\n    print("Boiling point")',
       explanation: 'Use == for comparison, not = (which is for assignment).',
       category: 'comparisons',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'comparisons'
     },
     {
+      id: 'dec_8',
       type: 'code-writing',
       question: 'Write a complete if-elif-else statement for grading (A: 90+, B: 80+, C: 70+, F: below 70):',
       answer: 'if score >= 90:\n    grade = "A"\nelif score >= 80:\n    grade = "B"\nelif score >= 70:\n    grade = "C"\nelse:\n    grade = "F"',
       explanation: 'Use if-elif-else to check multiple conditions in order from highest to lowest.',
       category: 'conditionals',
-      difficulty: 'hard'
+      difficulty: 'hard',
+      topic: 'conditionals'
     },
     {
+      id: 'dec_9',
       type: 'multiple-choice',
       question: 'What will this code output?\nx = 5\ny = 10\nif x < y and x > 0:\n    print("Valid")\nelse:\n    print("Invalid")',
       options: ['Valid', 'Invalid', 'Error', 'Nothing'],
       correct: 0,
       explanation: 'Both conditions are true: 5 < 10 AND 5 > 0, so "Valid" is printed.',
       category: 'logical-operators',
-      difficulty: 'medium'
+      difficulty: 'medium',
+      topic: 'logical-operators'
     },
     {
+      id: 'dec_10',
       type: 'code-completion',
       question: 'Complete the code to check if a number is between 1 and 100:\nif 1 _____ number _____ 100:',
       template: 'if 1 _____ number _____ 100:',
       answer: '<= and <=',
       explanation: 'Use <= and <= to check if number is between 1 and 100 inclusive.',
       category: 'logical-operators',
-      difficulty: 'hard'
+      difficulty: 'hard',
+      topic: 'logical-operators'
+    },
+    {
+      id: 'dec_11',
+      type: 'multiple-choice',
+      question: 'What is the result of: True and False?',
+      options: ['True', 'False', 'Error', 'None'],
+      correct: 1,
+      explanation: 'The "and" operator returns True only if both operands are True. True and False = False.',
+      category: 'logical-operators',
+      difficulty: 'medium',
+      topic: 'logical-operators'
+    },
+    {
+      id: 'dec_12',
+      type: 'code-writing',
+      question: 'Write code to check if a year is a leap year (divisible by 4 but not by 100, unless also divisible by 400):',
+      answer: 'if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):\n    print("Leap year")\nelse:\n    print("Not a leap year")',
+      explanation: 'A leap year is divisible by 4, but not by 100 unless also divisible by 400.',
+      category: 'logical-operators',
+      difficulty: 'hard',
+      topic: 'logical-operators'
     }
   ]
 };
@@ -675,6 +781,7 @@ const questionBank = {
 // Enhanced Learning System for Levels 3-4
 class MathDecisionLearningSystem {
   constructor() {
+    this.progressTracker = new EnhancedProgressTracker();
     this.currentLevel = null;
     this.currentQuestionIndex = 0;
     this.questions = [];
@@ -682,10 +789,11 @@ class MathDecisionLearningSystem {
     this.hearts = 5;
     this.score = 0;
     this.correctAnswers = 0;
-    this.weakAreas = new Set();
-    this.strongAreas = new Set();
     this.selectedAnswer = null;
     this.hasAnswered = false;
+    this.questionStartTime = null;
+    this.consecutiveCorrect = 0;
+    this.consecutiveIncorrect = 0;
   }
 
   startLevel(levelKey) {
@@ -695,11 +803,12 @@ class MathDecisionLearningSystem {
     this.hearts = 5;
     this.score = 0;
     this.correctAnswers = 0;
-    this.weakAreas.clear();
-    this.strongAreas.clear();
+    this.consecutiveCorrect = 0;
+    this.consecutiveIncorrect = 0;
     
-    // Get questions for this level
-    this.questions = this.selectQuestions(levelKey);
+    // Get adaptive questions based on user's mistake patterns
+    const allQuestions = questionBank[levelKey] || [];
+    this.questions = this.progressTracker.getAdaptiveQuestions(allQuestions, 12);
     
     // Show quiz container
     document.getElementById('quizContainer').classList.remove('hidden');
@@ -707,33 +816,6 @@ class MathDecisionLearningSystem {
     
     this.displayQuestion();
     this.updateHUD();
-  }
-
-  selectQuestions(levelKey) {
-    const allQuestions = questionBank[levelKey] || [];
-    
-    // Adaptive selection based on difficulty
-    let selectedQuestions = [];
-    
-    // Include questions of all difficulties
-    const easyQuestions = allQuestions.filter(q => q.difficulty === 'easy');
-    const mediumQuestions = allQuestions.filter(q => q.difficulty === 'medium');
-    const hardQuestions = allQuestions.filter(q => q.difficulty === 'hard');
-    
-    selectedQuestions.push(...this.shuffleArray(easyQuestions).slice(0, 4));
-    selectedQuestions.push(...this.shuffleArray(mediumQuestions).slice(0, 5));
-    selectedQuestions.push(...this.shuffleArray(hardQuestions).slice(0, 3));
-    
-    return this.shuffleArray(selectedQuestions);
-  }
-
-  shuffleArray(array) {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
   }
 
   displayQuestion() {
@@ -745,6 +827,7 @@ class MathDecisionLearningSystem {
     const question = this.questions[this.currentQuestionIndex];
     this.selectedAnswer = null;
     this.hasAnswered = false;
+    this.questionStartTime = Date.now();
 
     // Update question header
     document.getElementById('questionNumber').textContent = 
@@ -837,6 +920,7 @@ class MathDecisionLearningSystem {
     if (this.hasAnswered || this.selectedAnswer === null) return;
 
     const question = this.questions[this.currentQuestionIndex];
+    const timeSpent = (Date.now() - this.questionStartTime) / 1000;
     let isCorrect = false;
 
     // Check answer based on question type
@@ -856,26 +940,46 @@ class MathDecisionLearningSystem {
     }
 
     this.hasAnswered = true;
-    this.processAnswer(isCorrect, question);
+    this.processAnswer(isCorrect, question, timeSpent);
   }
 
   checkCodeAnswer(userAnswer, correctAnswer) {
-    // Normalize both answers for comparison
     const normalize = (code) => code.toLowerCase().replace(/\s+/g, ' ').trim();
     return normalize(userAnswer).includes(normalize(correctAnswer)) || 
            normalize(correctAnswer).includes(normalize(userAnswer));
   }
 
-  processAnswer(isCorrect, question) {
+  processAnswer(isCorrect, question, timeSpent) {
+    // Save individual answer
+    this.progressTracker.saveAnswer(
+      question.id, 
+      isCorrect, 
+      question.topic, 
+      question.difficulty, 
+      timeSpent, 
+      'levels3-4'
+    );
+
     // Update statistics
     if (isCorrect) {
       this.correctAnswers++;
-      this.score += this.calculatePoints(question.difficulty);
-      this.strongAreas.add(question.category);
+      this.score += this.calculatePoints(question.difficulty, timeSpent);
+      this.consecutiveCorrect++;
+      this.consecutiveIncorrect = 0;
+      
+      // Update quest progress
+      this.progressTracker.updateQuestProgress('accuracy', 1);
+      if (timeSpent < 15) {
+        this.progressTracker.updateQuestProgress('speed', 1);
+      }
     } else {
       this.hearts = Math.max(0, this.hearts - 1);
-      this.weakAreas.add(question.category);
+      this.consecutiveIncorrect++;
+      this.consecutiveCorrect = 0;
     }
+
+    // Adaptive feedback
+    this.showAdaptiveFeedback(isCorrect, question);
 
     // Show feedback
     this.showFeedback(isCorrect, question);
@@ -898,9 +1002,31 @@ class MathDecisionLearningSystem {
     }
   }
 
-  calculatePoints(difficulty) {
+  showAdaptiveFeedback(isCorrect, question) {
+    let message = '';
+    
+    if (this.consecutiveCorrect >= 3) {
+      message = '🚀 You\'re mastering math and logic! Keep it up!';
+    } else if (this.consecutiveIncorrect >= 2) {
+      message = '📚 Let\'s review these concepts step by step.';
+    } else if (isCorrect && this.progressTracker.userStats.weakAreas[question.topic]) {
+      message = '💪 Great improvement in this topic!';
+    }
+    
+    if (message) {
+      this.progressTracker.showAchievement(message);
+    }
+  }
+
+  calculatePoints(difficulty, timeSpent) {
     const points = { easy: 15, medium: 25, hard: 40 };
-    return points[difficulty] || 15;
+    let basePoints = points[difficulty] || 15;
+    
+    // Time bonus
+    if (timeSpent < 10) basePoints *= 1.5;
+    else if (timeSpent < 20) basePoints *= 1.2;
+    
+    return Math.round(basePoints);
   }
 
   showFeedback(isCorrect, question) {
@@ -956,6 +1082,9 @@ class MathDecisionLearningSystem {
     const progress = ((this.currentQuestionIndex + 1) / this.questions.length) * 100;
     document.getElementById('progressFill').style.width = progress + '%';
     document.getElementById('progressText').textContent = Math.round(progress) + '%';
+    
+    // Update XP display
+    document.getElementById('totalXP').textContent = this.progressTracker.userStats.totalXP;
   }
 
   completeLesson() {
@@ -971,23 +1100,22 @@ class MathDecisionLearningSystem {
     document.getElementById('finalStreak').textContent = streak;
 
     // Show weak areas if any
-    if (this.weakAreas.size > 0) {
+    const weakAreas = Object.keys(this.progressTracker.userStats.weakAreas);
+    if (weakAreas.length > 0) {
       document.getElementById('weakAreasDisplay').classList.remove('hidden');
       const weakAreasList = document.getElementById('weakAreasList');
-      weakAreasList.innerHTML = Array.from(this.weakAreas)
+      weakAreasList.innerHTML = weakAreas
         .map(area => `<span style="background: rgba(255,68,68,0.2); padding: 5px 10px; border-radius: 15px; margin: 5px; display: inline-block;">${area}</span>`)
         .join('');
     }
 
-    // Update global progress if available
-    if (window.progressTracker) {
-      window.progressTracker.updateLevelProgress(
-        `levels34`, 
-        this.correctAnswers, 
-        this.questions.length, 
-        xpEarned
-      );
-    }
+    // Update global progress
+    this.progressTracker.updateLevelProgress(
+      'levels34', 
+      this.correctAnswers, 
+      this.questions.length, 
+      xpEarned
+    );
 
     // Show completion screen
     document.getElementById('quizContainer').classList.add('hidden');
@@ -1023,7 +1151,7 @@ function nextQuestion() {
 }
 
 function goToMenu() {
-  window.location.href = 'index.html';
+  window.location.href = 'main.html';
 }
 
 function retryLesson() {
@@ -1052,13 +1180,10 @@ function createStars() {
 window.onload = function() {
   createStars();
   
-  // Load user progress if available
-  if (window.progressTracker) {
-    // Auto-login if session exists
-    const session = window.progressTracker.getLoginSession();
-    if (session) {
-      window.progressTracker.login(true);
-    }
+  // Auto-login if session exists
+  const session = learningSystem.progressTracker.getLoginSession();
+  if (session) {
+    learningSystem.progressTracker.login(true);
   }
 };
 </script>

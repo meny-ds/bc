@@ -248,6 +248,46 @@
       transform: translateY(-1px);
     }
     
+    .daily-quests {
+      background: rgba(255, 215, 0, 0.1);
+      border: 2px solid #ffd700;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 30px 0;
+    }
+    
+    .quest-title {
+      color: #ffd700;
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    .quest-item {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 10px;
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .quest-progress {
+      width: 100px;
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 5px 0;
+    }
+    
+    .quest-progress-fill {
+      height: 100%;
+      background: #ffd700;
+      transition: width 0.3s ease;
+    }
+    
     @media (max-width: 768px) {
       .menu-container { 
         padding: 20px 15px 50px 15px; 
@@ -314,6 +354,14 @@
   <div class="title">Code Quest</div>
   <div class="subtitle">Master Programming Through Interactive Adventures</div>
   
+  <!-- Daily Quests -->
+  <div class="daily-quests">
+    <div class="quest-title">🎯 Daily Quests</div>
+    <div id="dailyQuestsList">
+      <!-- Quests will be dynamically generated -->
+    </div>
+  </div>
+  
   <div class="parts-grid">
     <div class="part-card unlocked" onclick="goToPart('beginner')" id="beginnerCard">
       <div class="part-icon">🌱</div>
@@ -375,272 +423,59 @@
   </div>
 </div>
 
+<script src="enhanced-progress-tracker.js"></script>
 <script>
 // Enhanced user progress tracking
 class UserProgressTracker {
   constructor() {
-    this.currentUser = null;
-    this.userProgress = {};
-    this.userStats = {
-      totalXP: 0,
-      currentStreak: 0,
-      bestStreak: 0,
-      lastLoginDate: null,
-      totalQuestions: 0,
-      correctAnswers: 0,
-      achievements: [],
-      skillLevel: 'Beginner',
-      weakAreas: [],
-      strongAreas: []
-    };
-  }
-
-  // Session management
-  setLoginSession(username, password) {
-    localStorage.setItem('cq_current_user', JSON.stringify({username, password}));
-  }
-
-  getLoginSession() {
-    try {
-      return JSON.parse(localStorage.getItem('cq_current_user'));
-    } catch(e) { 
-      return null; 
-    }
-  }
-
-  clearLoginSession() {
-    localStorage.removeItem('cq_current_user');
+    this.progressTracker = new EnhancedProgressTracker();
   }
 
   // User management
   login(auto = false) {
-    let username, password;
-    
-    if (auto) {
-      const session = this.getLoginSession();
-      if (!session) return false;
-      username = session.username;
-      password = session.password;
-    } else {
-      username = document.getElementById('loginUsername').value.trim();
-      password = document.getElementById('loginPassword').value;
+    const success = this.progressTracker.login(auto);
+    if (success) {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('mainMenuContent').style.display = '';
+      document.getElementById('userHud').style.display = '';
       
-      if (!username || !password) {
-        document.getElementById('loginMsg').textContent = "Please enter both username and password.";
-        return false;
-      }
-      
-      if (username.length < 3) {
-        document.getElementById('loginMsg').textContent = "Username must be at least 3 characters.";
-        return false;
-      }
-      
-      this.setLoginSession(username, password);
+      this.updateDisplay();
+      this.checkUnlocks();
+      this.updateDailyQuests();
     }
-
-    const userKey = `cq_user_${username}_${password}`;
-    let savedData = localStorage.getItem(userKey);
-    
-    if (!savedData) {
-      // New user - initialize progress
-      this.userProgress = {
-        levels12: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
-        levels34: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
-        levels56: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
-        levels78: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
-        levels910: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
-        levels1112: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
-        levels1314: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
-        levels1516: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
-        levels1718: { completed: false, accuracy: 0, attempts: 0, xp: 0 },
-        levels1920: { completed: false, accuracy: 0, attempts: 0, xp: 0 }
-      };
-      
-      this.userStats = {
-        totalXP: 0,
-        currentStreak: 1,
-        bestStreak: 1,
-        lastLoginDate: new Date().toDateString(),
-        totalQuestions: 0,
-        correctAnswers: 0,
-        achievements: ['🎉 Welcome to Code Quest!'],
-        skillLevel: 'Beginner',
-        weakAreas: [],
-        strongAreas: []
-      };
-      
-      this.saveUserData(userKey);
-    } else {
-      const data = JSON.parse(savedData);
-      this.userProgress = data.progress || {};
-      this.userStats = data.stats || this.userStats;
-      
-      // Update streak
-      this.updateStreak();
-    }
-
-    this.currentUser = { username, password, key: userKey };
-    
-    // Show main content
-    document.getElementById('loginSection').style.display = 'none';
-    document.getElementById('mainMenuContent').style.display = '';
-    document.getElementById('userHud').style.display = '';
-    
-    this.updateDisplay();
-    this.checkUnlocks();
-    
-    return true;
+    return success;
   }
 
   logout() {
-    this.clearLoginSession();
-    this.currentUser = null;
-    this.userProgress = {};
-    this.userStats = {};
-    
+    this.progressTracker.logout();
     document.getElementById('mainMenuContent').style.display = 'none';
     document.getElementById('userHud').style.display = 'none';
     document.getElementById('loginSection').style.display = '';
-    
-    // Reset displays
-    document.getElementById('currentUser').textContent = "Not logged in";
-    this.updatePartCards();
   }
 
-  // Progress tracking
-  updateStreak() {
-    const today = new Date().toDateString();
-    const lastLogin = this.userStats.lastLoginDate;
-    
-    if (lastLogin === today) {
-      // Same day, no change
-      return;
-    }
-    
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    if (lastLogin === yesterday.toDateString()) {
-      // Consecutive day
-      this.userStats.currentStreak++;
-      this.userStats.bestStreak = Math.max(this.userStats.bestStreak, this.userStats.currentStreak);
-    } else {
-      // Streak broken
-      this.userStats.currentStreak = 1;
-    }
-    
-    this.userStats.lastLoginDate = today;
-    this.saveProgress();
-  }
-
-  addXP(amount, category = 'general') {
-    this.userStats.totalXP += amount;
-    
-    // Update skill level based on XP
-    if (this.userStats.totalXP >= 10000) {
-      this.userStats.skillLevel = 'Master';
-    } else if (this.userStats.totalXP >= 5000) {
-      this.userStats.skillLevel = 'Expert';
-    } else if (this.userStats.totalXP >= 2000) {
-      this.userStats.skillLevel = 'Advanced';
-    } else if (this.userStats.totalXP >= 500) {
-      this.userStats.skillLevel = 'Intermediate';
-    }
-    
-    this.checkAchievements();
-    this.saveProgress();
-  }
-
-  recordAnswer(correct, category) {
-    this.userStats.totalQuestions++;
-    if (correct) {
-      this.userStats.correctAnswers++;
-    }
-    
-    // Track weak/strong areas
-    if (correct) {
-      if (!this.userStats.strongAreas.includes(category)) {
-        this.userStats.strongAreas.push(category);
-      }
-      this.userStats.weakAreas = this.userStats.weakAreas.filter(area => area !== category);
-    } else {
-      if (!this.userStats.weakAreas.includes(category)) {
-        this.userStats.weakAreas.push(category);
-      }
-    }
-    
-    this.saveProgress();
-  }
-
-  checkAchievements() {
-    const achievements = this.userStats.achievements;
-    
-    // XP milestones
-    if (this.userStats.totalXP >= 1000 && !achievements.includes('🌟 First 1000 XP')) {
-      achievements.push('🌟 First 1000 XP');
-    }
-    if (this.userStats.totalXP >= 5000 && !achievements.includes('💎 5000 XP Master')) {
-      achievements.push('💎 5000 XP Master');
-    }
-    
-    // Streak achievements
-    if (this.userStats.currentStreak >= 7 && !achievements.includes('🔥 Week Warrior')) {
-      achievements.push('🔥 Week Warrior');
-    }
-    if (this.userStats.currentStreak >= 30 && !achievements.includes('🏆 Month Master')) {
-      achievements.push('🏆 Month Master');
-    }
-    
-    // Accuracy achievements
-    const accuracy = this.getOverallAccuracy();
-    if (accuracy >= 90 && this.userStats.totalQuestions >= 50 && !achievements.includes('🎯 Precision Pro')) {
-      achievements.push('🎯 Precision Pro');
-    }
-  }
-
-  getOverallAccuracy() {
-    if (this.userStats.totalQuestions === 0) return 0;
-    return Math.round((this.userStats.correctAnswers / this.userStats.totalQuestions) * 100);
-  }
-
-  // Data persistence
-  saveProgress() {
-    if (this.currentUser) {
-      const data = {
-        progress: this.userProgress,
-        stats: this.userStats
-      };
-      localStorage.setItem(this.currentUser.key, JSON.stringify(data));
-    }
-  }
-
-  saveUserData(userKey) {
-    const data = {
-      progress: this.userProgress,
-      stats: this.userStats
-    };
-    localStorage.setItem(userKey, JSON.stringify(data));
-  }
-
-  // UI Updates
   updateDisplay() {
-    document.getElementById('currentUser').textContent = this.currentUser.username;
-    document.getElementById('totalXP').textContent = this.userStats.totalXP;
-    document.getElementById('currentStreak').textContent = this.userStats.currentStreak;
-    document.getElementById('bestStreak').textContent = this.userStats.bestStreak;
+    if (!this.progressTracker.currentUser) return;
+    
+    const stats = this.progressTracker.userStats;
+    
+    // Update profile display
+    document.getElementById('currentUser').textContent = this.progressTracker.currentUser.username;
+    document.getElementById('totalXP').textContent = stats.totalXP;
+    document.getElementById('currentStreak').textContent = stats.currentStreak;
+    document.getElementById('bestStreak').textContent = stats.bestStreak;
     document.getElementById('overallAccuracy').textContent = this.getOverallAccuracy() + '%';
-    document.getElementById('skillLevel').textContent = this.userStats.skillLevel;
+    document.getElementById('skillLevel').textContent = stats.skillLevel || 'Beginner';
     
     // Calculate overall progress
-    const completedLevels = Object.values(this.userProgress).filter(level => level.completed).length;
-    const totalLevels = Object.keys(this.userProgress).length;
+    const completedLevels = Object.values(this.progressTracker.userProgress).filter(level => level.completed).length;
+    const totalLevels = Object.keys(this.progressTracker.userProgress).length;
     const overallProgress = Math.round((completedLevels / totalLevels) * 100);
     document.getElementById('overallProgress').textContent = overallProgress + '%';
     
     // Update achievements
-    if (this.userStats.achievements.length > 1) {
+    if (stats.achievements.length > 1) {
       document.getElementById('achievementSection').style.display = '';
-      const badgesHtml = this.userStats.achievements.slice(-3).map(achievement => 
+      const badgesHtml = stats.achievements.slice(-3).map(achievement => 
         `<span class="achievement-badge">${achievement}</span>`
       ).join('');
       document.getElementById('achievementBadges').innerHTML = badgesHtml;
@@ -649,12 +484,18 @@ class UserProgressTracker {
     this.updatePartCards();
   }
 
+  getOverallAccuracy() {
+    const stats = this.progressTracker.userStats;
+    if (stats.totalQuestions === 0) return 0;
+    return Math.round((stats.correctAnswers / stats.totalQuestions) * 100);
+  }
+
   updatePartCards() {
     // Part 1 progress
     const part1Levels = ['levels12', 'levels34', 'levels56', 'levels78', 'levels910'];
-    const part1Completed = part1Levels.filter(level => this.userProgress[level]?.completed).length;
+    const part1Completed = part1Levels.filter(level => this.progressTracker.userProgress[level]?.completed).length;
     const part1Progress = Math.round((part1Completed / part1Levels.length) * 100);
-    const part1XP = part1Levels.reduce((total, level) => total + (this.userProgress[level]?.xp || 0), 0);
+    const part1XP = part1Levels.reduce((total, level) => total + (this.progressTracker.userProgress[level]?.xp || 0), 0);
     const part1Accuracy = this.calculatePartAccuracy(part1Levels);
     
     document.getElementById('part1Progress').textContent = part1Progress + '%';
@@ -662,17 +503,11 @@ class UserProgressTracker {
     document.getElementById('part1XP').textContent = part1XP;
     document.getElementById('part1Accuracy').textContent = part1Accuracy + '%';
     
-    // Part 2 progress
-    const part2Levels = ['levels1112', 'levels1314', 'levels1516', 'levels1718', 'levels1920'];
-    const part2Completed = part2Levels.filter(level => this.userProgress[level]?.completed).length;
-    const part2Progress = Math.round((part2Completed / part2Levels.length) * 100);
-    const part2XP = part2Levels.reduce((total, level) => total + (this.userProgress[level]?.xp || 0), 0);
-    const part2Accuracy = this.calculatePartAccuracy(part2Levels);
-    
-    document.getElementById('part2Progress').textContent = part2Progress + '%';
-    document.getElementById('part2Fill').style.width = part2Progress + '%';
-    document.getElementById('part2XP').textContent = part2XP;
-    document.getElementById('part2Accuracy').textContent = part2Accuracy + '%';
+    // Part 2 progress (placeholder)
+    document.getElementById('part2Progress').textContent = '0%';
+    document.getElementById('part2Fill').style.width = '0%';
+    document.getElementById('part2XP').textContent = '0';
+    document.getElementById('part2Accuracy').textContent = '0%';
   }
 
   calculatePartAccuracy(levels) {
@@ -680,18 +515,52 @@ class UserProgressTracker {
     let correctAnswers = 0;
     
     levels.forEach(level => {
-      if (this.userProgress[level]) {
-        totalQuestions += this.userProgress[level].attempts || 0;
-        correctAnswers += Math.round((this.userProgress[level].accuracy || 0) * (this.userProgress[level].attempts || 0) / 100);
+      if (this.progressTracker.userProgress[level]) {
+        totalQuestions += this.progressTracker.userProgress[level].questionsTotal || 0;
+        correctAnswers += this.progressTracker.userProgress[level].questionsCorrect || 0;
       }
     });
     
     return totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
   }
 
+  updateDailyQuests() {
+    this.progressTracker.updateDailyQuests();
+    const questsList = document.getElementById('dailyQuestsList');
+    questsList.innerHTML = '';
+    
+    this.progressTracker.dailyQuests.forEach(quest => {
+      const questDiv = document.createElement('div');
+      questDiv.className = 'quest-item';
+      
+      const progressPercent = Math.round((quest.progress / quest.target) * 100);
+      const isCompleted = quest.progress >= quest.target;
+      
+      questDiv.innerHTML = `
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.2em;">${quest.icon}</span>
+            <strong>${quest.title}</strong>
+            ${isCompleted ? '<span style="color: #00ff00;">✅</span>' : ''}
+          </div>
+          <div style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">${quest.description}</div>
+          <div class="quest-progress">
+            <div class="quest-progress-fill" style="width: ${progressPercent}%"></div>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div style="color: #ffd700; font-weight: bold;">+${quest.reward} XP</div>
+          <div style="font-size: 0.9em;">${quest.progress}/${quest.target}</div>
+        </div>
+      `;
+      
+      questsList.appendChild(questDiv);
+    });
+  }
+
   checkUnlocks() {
     const part1Levels = ['levels12', 'levels34', 'levels56', 'levels78', 'levels910'];
-    const part1Complete = part1Levels.every(level => this.userProgress[level]?.completed);
+    const part1Complete = part1Levels.every(level => this.progressTracker.userProgress[level]?.completed);
     
     const advancedCard = document.getElementById('advancedCard');
     if (part1Complete) {
@@ -710,7 +579,7 @@ class UserProgressTracker {
       window.location.href = 'index.html';
     } else if (part === 'advanced') {
       const part1Levels = ['levels12', 'levels34', 'levels56', 'levels78', 'levels910'];
-      const part1Complete = part1Levels.every(level => this.userProgress[level]?.completed);
+      const part1Complete = part1Levels.every(level => this.progressTracker.userProgress[level]?.completed);
       
       if (part1Complete) {
         window.location.href = 'index-advanced.html';
@@ -760,7 +629,7 @@ window.onload = function() {
   createStars();
   
   // Try auto-login if session exists
-  const session = progressTracker.getLoginSession();
+  const session = progressTracker.progressTracker.getLoginSession();
   if (session) {
     progressTracker.login(true);
   }
