@@ -1,0 +1,481 @@
+/* Code Quest - Main Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1e1e2f 0%, #2d1b69 100%);
+  color: #fff;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Stars Animation */
+.stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+/* Container */
+.container {
+  position: relative;
+  z-index: 10;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+.main-header {
+  text-align: center;
+  margin-bottom: 40px;
+  background: rgba(21, 21, 43, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.title {
+  font-size: 3em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  background: linear-gradient(45deg, #00ffff, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: 1.2em;
+  color: #00ffff;
+  opacity: 0.9;
+}
+
+/* HUD */
+.hud {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(41, 41, 72, 0.95);
+  backdrop-filter: blur(15px);
+  padding: 20px;
+  border-radius: 20px;
+  border: 2px solid #00ffff;
+  z-index: 1000;
+  min-width: 280px;
+  box-shadow: 0 10px 40px rgba(0, 255, 255, 0.3);
+}
+
+.hud-section {
+  margin: 15px 0;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.hud-section:last-child {
+  border-bottom: none;
+}
+
+.user-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logout-btn {
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid #ff4444;
+  color: #ff4444;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+.xp-bar {
+  width: 100%;
+  height: 12px;
+  background: #333;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ffff, #ffd700);
+  transition: width 0.8s ease;
+  border-radius: 6px;
+}
+
+.xp-text {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.streak-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.streak-flame {
+  font-size: 1.2em;
+  animation: flicker 1s infinite alternate;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+/* Login Form */
+.login-form {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #00ffff;
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 400px;
+  margin: 50px auto;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.login-form h2 {
+  color: #00ffff;
+  margin-bottom: 20px;
+}
+
+.login-form p {
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+.login-form input {
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 2px solid #00ffff;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1em;
+}
+
+.login-form input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.login-form button {
+  width: 100%;
+  margin-top: 15px;
+  background: linear-gradient(90deg, #00ffff, #ffd700);
+  color: #222;
+  font-weight: bold;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-form button:hover {
+  background: linear-gradient(90deg, #ffd700, #00ffff);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+}
+
+.login-message {
+  color: #ffd700;
+  margin-top: 15px;
+  font-size: 0.9em;
+}
+
+/* Sections */
+.section-title {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #00ffff;
+}
+
+/* Daily Quests */
+.quests-panel {
+  background: rgba(41, 41, 72, 0.9);
+  border: 2px solid #ffd700;
+  border-radius: 20px;
+  padding: 25px;
+  margin: 30px 0;
+}
+
+.quests-title {
+  font-size: 1.5em;
+  color: #ffd700;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.quests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.quest-card {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid #ffd700;
+  border-radius: 15px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.quest-card:hover {
+  background: rgba(255, 215, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.quest-card.completed {
+  background: rgba(0, 255, 0, 0.1);
+  border-color: #00ff00;
+}
+
+.quest-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.quest-icon {
+  font-size: 1.5em;
+}
+
+.quest-title {
+  font-weight: bold;
+}
+
+.quest-description {
+  margin-bottom: 10px;
+  opacity: 0.9;
+  font-size: 0.9em;
+}
+
+.quest-progress {
+  margin-bottom: 10px;
+}
+
+.quest-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.quest-progress-fill {
+  height: 100%;
+  background: #ffd700;
+  transition: width 0.3s ease;
+}
+
+.quest-reward {
+  color: #ffd700;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Learning Path */
+.learning-path {
+  margin: 40px 0;
+}
+
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.level-card {
+  background: rgba(41, 41, 72, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 25px;
+  border-radius: 20px;
+  border: 2px solid #444;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.level-card:hover {
+  border-color: #00ffff;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
+}
+
+.level-card.completed {
+  border-color: #00ff00;
+  background: rgba(0, 255, 0, 0.1);
+}
+
+.level-card.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+  border-color: #666;
+}
+
+.level-icon {
+  font-size: 3em;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.level-title {
+  font-size: 1.4em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.level-description {
+  opacity: 0.8;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.level-progress {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.progress-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ffff, #00ff00);
+  transition: width 0.5s ease;
+  border-radius: 4px;
+}
+
+/* Progress Overview */
+.progress-overview {
+  margin: 40px 0;
+}
+
+.progress-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: rgba(41, 41, 72, 0.8);
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #444;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2em;
+  font-weight: bold;
+  color: #00ffff;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  opacity: 0.8;
+}
+
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Achievement Notification */
+.achievement-notification {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #000;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  z-index: 1001;
+  transform: translateX(300px);
+  transition: transform 0.5s ease;
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+  max-width: 300px;
+}
+
+.achievement-notification.show {
+  transform: translateX(0);
+}

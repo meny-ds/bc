@@ -1,0 +1,275 @@
+/* Code Quest - Responsive Styles */
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+  .container {
+    padding: 15px;
+  }
+  
+  .title {
+    font-size: 2.5em;
+  }
+  
+  .hud {
+    min-width: 250px;
+  }
+  
+  .levels-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .quests-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .title {
+    font-size: 2.2em;
+  }
+  
+  .subtitle {
+    font-size: 1em;
+  }
+  
+  .main-header {
+    padding: 20px;
+  }
+  
+  /* Mobile HUD */
+  .hud {
+    position: static;
+    margin: 20px auto;
+    max-width: 350px;
+    min-width: auto;
+  }
+  
+  /* Mobile Grids */
+  .levels-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .quests-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .progress-stats {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+  }
+  
+  /* Mobile Cards */
+  .level-card {
+    padding: 20px;
+  }
+  
+  .quest-card {
+    padding: 15px;
+  }
+  
+  .stat-card {
+    padding: 15px;
+  }
+  
+  /* Mobile Login */
+  .login-form {
+    margin: 20px auto;
+    padding: 20px;
+  }
+  
+  /* Mobile Text */
+  .level-title {
+    font-size: 1.2em;
+  }
+  
+  .level-description {
+    font-size: 0.9em;
+  }
+  
+  .quest-title {
+    font-size: 0.9em;
+  }
+  
+  .quest-description {
+    font-size: 0.8em;
+  }
+  
+  /* Mobile Spacing */
+  .quests-panel {
+    padding: 20px;
+    margin: 20px 0;
+  }
+  
+  .learning-path {
+    margin: 30px 0;
+  }
+  
+  .progress-overview {
+    margin: 30px 0;
+  }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+  .container {
+    padding: 5px;
+  }
+  
+  .title {
+    font-size: 1.8em;
+  }
+  
+  .main-header {
+    padding: 15px;
+  }
+  
+  .hud {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  .level-card {
+    padding: 15px;
+  }
+  
+  .quest-card {
+    padding: 12px;
+  }
+  
+  .login-form {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  .login-form input {
+    padding: 10px 12px;
+  }
+  
+  .login-form button {
+    padding: 10px 20px;
+  }
+  
+  .stat-value {
+    font-size: 1.5em;
+  }
+  
+  .level-icon {
+    font-size: 2.5em;
+  }
+  
+  .quest-icon {
+    font-size: 1.2em;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hud {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+    min-width: 200px;
+  }
+  
+  .container {
+    padding-top: 10px;
+  }
+  
+  .main-header {
+    padding: 15px;
+  }
+  
+  .title {
+    font-size: 2em;
+  }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .star {
+    transform: scale(0.5);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .star {
+    animation: none;
+  }
+  
+  .streak-flame {
+    animation: none;
+  }
+  
+  .achievement-notification {
+    transition: none;
+  }
+  
+  .level-card {
+    transition: none;
+  }
+  
+  .quest-card {
+    transition: none;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  /* Already dark by default */
+}
+
+/* Light Mode Override (if needed) */
+@media (prefers-color-scheme: light) {
+  /* Keep dark theme for consistency */
+}
+
+/* Print Styles */
+@media print {
+  .stars,
+  .hud,
+  .login-form {
+    display: none;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .container {
+    max-width: none;
+    padding: 0;
+  }
+}
+
+/* Focus Styles for Accessibility */
+button:focus,
+input:focus,
+.level-card:focus,
+.quest-card:focus {
+  outline: 2px solid #00ffff;
+  outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .level-card,
+  .quest-card,
+  .stat-card {
+    border-width: 3px;
+  }
+  
+  .hud {
+    border-width: 3px;
+  }
+}
