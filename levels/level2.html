@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Quest - Level 3-4: Math & Decisions</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <style>
+    .quiz-container {
+      background: rgba(41, 41, 72, 0.9);
+      backdrop-filter: blur(15px);
+      margin: 20px auto;
+      padding: 40px;
+      border-radius: 25px;
+      border: 2px solid #ff6b9d;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      max-width: 800px;
+    }
+    
+    .question-number {
+      background: rgba(255, 107, 157, 0.2);
+      color: #ff6b9d;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      margin-bottom: 15px;
+      display: inline-block;
+    }
+    
+    .option-button:hover {
+      border-color: #ff6b9d;
+      background: rgba(255, 107, 157, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .option-button.selected {
+      border-color: #ff6b9d;
+      background: rgba(255, 107, 157, 0.2);
+    }
+    
+    .code-input:focus {
+      outline: none;
+      border-color: #ff6b9d;
+      box-shadow: 0 0 15px rgba(255, 107, 157, 0.3);
+    }
+    
+    .button {
+      background: linear-gradient(45deg, #ff6b9d, #f8b500);
+      color: #000;
+    }
+    
+    .button:hover {
+      background: linear-gradient(45deg, #f8b500, #ff6b9d);
+    }
+    
+    .nav-btn {
+      color: #ff6b9d;
+      border: 2px solid #ff6b9d;
+    }
+    
+    .nav-btn:hover {
+      background: linear-gradient(45deg, #ff6b9d, #f8b500);
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  
+  <div class="container">
+    <header class="main-header">
+      <h1>🔢 Level 3-4: Math & Decisions</h1>
+      <p>Calculations, if/else statements, and logical thinking</p>
+    </header>
+
+    <!-- Quiz System -->
+    <div id="quizContainer" class="quiz-container">
+      <div class="question-header">
+        <div class="question-number" id="questionNumber">Question 1 of 12</div>
+        <div class="question-text" id="questionText">What operator is used for addition in Python?</div>
+      </div>
+      
+      <div id="questionContent"></div>
+      <div class="question-options" id="questionOptions"></div>
+      
+      <div id="feedbackContainer" class="feedback-container hidden">
+        <div id="feedbackText"></div>
+        <div id="explanationText" class="explanation"></div>
+      </div>
+      
+      <div style="text-align: center; margin-top: 30px;">
+        <button class="button" id="submitButton" onclick="submitAnswer()" disabled>Check Answer</button>
+        <button class="button hidden" id="nextButton" onclick="nextQuestion()">Next Question</button>
+      </div>
+    </div>
+
+    <!-- Lesson Complete Screen -->
+    <div id="lessonComplete" class="lesson-complete hidden">
+      <h2>🎉 Level Complete!</h2>
+      <div class="stats-display">
+        <div class="stat-card">
+          <div class="stat-value" id="finalScore">0</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="finalAccuracy">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="finalXP">0</div>
+          <div class="stat-label">XP Earned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="finalStreak">0</div>
+          <div class="stat-label">Streak</div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 30px;">
+        <button class="button" onclick="goToMenu()">🏠 Main Menu</button>
+        <button class="button" onclick="retryLesson()">🔄 Retry Lesson</button>
+        <button class="button" onclick="nextLevel()">Next Level →</button>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <a href="level1.html" class="nav-btn">← Level 1-2</a>
+      <a href="../index.html" class="nav-btn">🏠 Main Menu</a>
+      <a href="level3.html" class="nav-btn">Level 5-6 →</a>
+    </div>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script>
+    // Question Bank for Level 3-4
+    const questionBank = [
+      {
+        id: 'math_1',
+        type: 'multiple-choice',
+        question: 'What operator is used for addition in Python?',
+        options: ['+', '-', '*', '/'],
+        correct: 0,
+        explanation: 'The + operator is used for addition in Python. For example: 5 + 3 = 8',
+        category: 'operators',
+        difficulty: 'easy',
+        topic: 'operators'
+      },
+      {
+        id: 'math_2',
+        type: 'multiple-choice',
+        question: 'What will 10 / 3 return in Python?',
+        options: ['3', '3.33', '3.3333333333333335', '4'],
+        correct: 2,
+        explanation: 'Division (/) in Python returns a float with full precision, so 10/3 gives 3.3333333333333335',
+        category: 'operators',
+        difficulty: 'medium',
+        topic: 'operators'
+      },
+      {
+        id: 'dec_1',
+        type: 'multiple-choice',
+        question: 'Which keyword is used to start a conditional statement in Python?',
+        options: ['when', 'if', 'check', 'condition'],
+        correct: 1,
+        explanation: 'The "if" keyword is used to start conditional statements in Python.',
+        category: 'conditionals',
+        difficulty: 'easy',
+        topic: 'conditionals'
+      },
+      {
+        id: 'dec_2',
+        type: 'multiple-choice',
+        question: 'What will this code print?\nage = 16\nif age >= 18:\n    print("Adult")\nelse:\n    print("Minor")',
+        options: ['Adult', 'Minor', 'Error', 'Nothing'],
+        correct: 1,
+        explanation: 'Since 16 is less than 18, the condition is False, so "Minor" is printed.',
+        category: 'conditionals',
+        difficulty: 'easy',
+        topic: 'conditionals'
+      },
+      {
+        id: 'math_3',
+        type: 'code-writing',
+        question: 'Write Python code to calculate the area of a rectangle with length 8 and width 5:',
+        answer: 'area = 8 * 5',
+        explanation: 'Area of rectangle = length × width, so area = 8 * 5 = 40',
+        category: 'calculations',
+        difficulty: 'easy',
+        topic: 'calculations'
+      },
+      {
+        id: 'dec_3',
+        type: 'multiple-choice',
+        question: 'Which operator checks if two values are equal?',
+        options: ['=', '==', '!=', '==='],
+        correct: 1,
+        explanation: 'The == operator checks equality. = is for assignment, != is for not equal.',
+        category: 'comparisons',
+        difficulty: 'easy',
+        topic: 'comparisons'
+      },
+      {
+        id: 'math_4',
+        type: 'multiple-choice',
+        question: 'What does the ** operator do in Python?',
+        options: ['Multiplication', 'Division', 'Exponentiation', 'Modulo'],
+        correct: 2,
+        explanation: 'The ** operator is used for exponentiation (power). For example: 2**3 = 8',
+        category: 'operators',
+        difficulty: 'medium',
+        topic: 'operators'
+      },
+      {
+        id: 'dec_4',
+        type: 'code-writing',
+        question: 'Write an if statement to check if a score is 90 or above for an A grade:',
+        answer: 'if score >= 90:\n    print("A grade")',
+        explanation: 'Use >= to check if score is greater than or equal to 90.',
+        category: 'conditionals',
+        difficulty: 'medium',
+        topic: 'conditionals'
+      },
+      {
+        id: 'math_5',
+        type: 'multiple-choice',
+        question: 'What is the result of 15 // 4 in Python?',
+        options: ['3', '3.75', '4', '3.0'],
+        correct: 0,
+        explanation: 'The // operator performs floor division, returning only the whole number part. 15 // 4 = 3',
+        category: 'operators',
+        difficulty: 'medium',
+        topic: 'operators'
+      },
+      {
+        id: 'dec_5',
+        type: 'multiple-choice',
+        question: 'What does elif stand for?',
+        options: ['else if', 'end if', 'equal if', 'error if'],
+        correct: 0,
+        explanation: 'elif is short for "else if" and allows checking multiple conditions.',
+        category: 'conditionals',
+        difficulty: 'medium',
+        topic: 'conditionals'
+      },
+      {
+        id: 'math_6',
+        type: 'code-writing',
+        question: 'Write code to convert temperature from Celsius to Fahrenheit (formula: F = C * 9/5 + 32):',
+        answer: 'fahrenheit = celsius * 9/5 + 32',
+        explanation: 'The temperature conversion formula is F = C × 9/5 + 32',
+        category: 'calculations',
+        difficulty: 'medium',
+        topic: 'calculations'
+      },
+      {
+        id: 'dec_6',
+        type: 'multiple-choice',
+        question: 'What is the result of: True and False?',
+        options: ['True', 'False', 'Error', 'None'],
+        correct: 1,
+        explanation: 'The "and" operator returns True only if both operands are True. True and False = False.',
+        category: 'logical-operators',
+        difficulty: 'medium',
+        topic: 'logical-operators'
+      }
+    ];
+
+    // Level Learning System
+    class Level2LearningSystem {
+      constructor() {
+        this.currentQuestionIndex = 0;
+        this.questions = [];
+        this.userAnswers = [];
+        this.score = 0;
+        this.correctAnswers = 0;
+        this.selectedAnswer = null;
+        this.hasAnswered = false;
+        this.questionStartTime = null;
+        this.sessionStartTime = Date.now();
+      }
+
+      async initialize() {
+        if (window.app && window.app.adaptiveLearning) {
+          this.questions = window.app.adaptiveLearning.getAdaptiveQuestions(questionBank, 12);
+        } else {
+          this.questions = this.shuffleArray(questionBank).slice(0, 12);
+        }
+        
+        this.displayQuestion();
+      }
+
+      displayQuestion() {
+        if (this.currentQuestionIndex >= this.questions.length) {
+          this.completeLesson();
+          return;
+        }
+
+        const question = this.questions[this.currentQuestionIndex];
+        this.selectedAnswer = null;
+        this.hasAnswered = false;
+        this.questionStartTime = Date.now();
+
+        document.getElementById('questionNumber').textContent = 
+          `Question ${this.currentQuestionIndex + 1} of ${this.questions.length}`;
+        document.getElementById('questionText').textContent = question.question;
+
+        document.getElementById('questionContent').innerHTML = '';
+        document.getElementById('questionOptions').innerHTML = '';
+        document.getElementById('feedbackContainer').classList.add('hidden');
+        document.getElementById('submitButton').disabled = true;
+        document.getElementById('nextButton').classList.add('hidden');
+
+        this.displayQuestionByType(question);
+      }
+
+      displayQuestionByType(question) {
+        const optionsContainer = document.getElementById('questionOptions');
+        const contentContainer = document.getElementById('questionContent');
+
+        switch (question.type) {
+          case 'multiple-choice':
+            question.options.forEach((option, index) => {
+              const button = document.createElement('button');
+              button.className = 'option-button';
+              button.textContent = option;
+              button.onclick = () => this.selectOption(index);
+              optionsContainer.appendChild(button);
+            });
+            break;
+
+          case 'code-writing':
+            const textarea = document.createElement('textarea');
+            textarea.className = 'code-input';
+            textarea.placeholder = 'Write your Python code here...';
+            textarea.oninput = () => {
+              this.selectedAnswer = textarea.value.trim();
+              document.getElementById('submitButton').disabled = !this.selectedAnswer;
+            };
+            contentContainer.appendChild(textarea);
+            break;
+        }
+      }
+
+      selectOption(index) {
+        if (this.hasAnswered) return;
+
+        document.querySelectorAll('.option-button').forEach(btn => {
+          btn.classList.remove('selected');
+        });
+
+        document.querySelectorAll('.option-button')[index].classList.add('selected');
+        this.selectedAnswer = index;
+        document.getElementById('submitButton').disabled = false;
+      }
+
+      submitAnswer() {
+        if (this.hasAnswered || this.selectedAnswer === null) return;
+
+        const question = this.questions[this.currentQuestionIndex];
+        const timeSpent = (Date.now() - this.questionStartTime) / 1000;
+        let isCorrect = false;
+
+        switch (question.type) {
+          case 'multiple-choice':
+            isCorrect = this.selectedAnswer === question.correct;
+            break;
+          
+          case 'code-writing':
+            isCorrect = this.checkCodeAnswer(this.selectedAnswer, question.answer);
+            break;
+        }
+
+        this.hasAnswered = true;
+        this.processAnswer(isCorrect, question, timeSpent);
+      }
+
+      checkCodeAnswer(userAnswer, correctAnswer) {
+        const normalize = (code) => code.toLowerCase().replace(/\s+/g, ' ').trim();
+        return normalize(userAnswer).includes(normalize(correctAnswer)) || 
+               normalize(correctAnswer).includes(normalize(userAnswer));
+      }
+
+      processAnswer(isCorrect, question, timeSpent) {
+        if (window.app && window.app.progressTracker) {
+          window.app.progressTracker.recordAnswer(
+            question.id, isCorrect, question.topic, question.difficulty, timeSpent, 'level2'
+          );
+        }
+
+        if (window.app && window.app.questManager) {
+          window.app.questManager.trackAnswer(isCorrect, question.topic, question.difficulty, timeSpent);
+        }
+
+        if (isCorrect) {
+          this.correctAnswers++;
+          this.score += this.calculatePoints(question.difficulty, timeSpent);
+        }
+
+        this.showFeedback(isCorrect, question);
+        
+        if (question.type === 'multiple-choice') {
+          this.updateOptionVisuals(isCorrect, question.correct);
+        }
+
+        document.getElementById('submitButton').classList.add('hidden');
+        document.getElementById('nextButton').classList.remove('hidden');
+      }
+
+      calculatePoints(difficulty, timeSpent) {
+        const points = { easy: 15, medium: 25, hard: 40 };
+        let basePoints = points[difficulty] || 15;
+        
+        if (timeSpent < 10) basePoints *= 1.5;
+        else if (timeSpent < 20) basePoints *= 1.2;
+        
+        return Math.round(basePoints);
+      }
+
+      showFeedback(isCorrect, question) {
+        const container = document.getElementById('feedbackContainer');
+        const feedbackText = document.getElementById('feedbackText');
+        const explanationText = document.getElementById('explanationText');
+
+        container.classList.remove('hidden', 'feedback-correct', 'feedback-incorrect');
+        
+        if (isCorrect) {
+          container.classList.add('feedback-correct');
+          feedbackText.textContent = '✅ Excellent! You got it right!';
+        } else {
+          container.classList.add('feedback-incorrect');
+          feedbackText.textContent = '❌ Not quite right. Let\'s learn from this!';
+        }
+
+        explanationText.textContent = question.explanation;
+      }
+
+      updateOptionVisuals(isCorrect, correctIndex) {
+        const options = document.querySelectorAll('.option-button');
+        
+        options.forEach((option, index) => {
+          option.classList.add('disabled');
+          
+          if (index === correctIndex) {
+            option.classList.add('correct');
+          } else if (index === this.selectedAnswer && !isCorrect) {
+            option.classList.add('incorrect');
+          }
+        });
+      }
+
+      nextQuestion() {
+        this.currentQuestionIndex++;
+        this.displayQuestion();
+      }
+
+      completeLesson() {
+        const accuracy = Math.round((this.correctAnswers / this.questions.length) * 100);
+        const xpEarned = this.score;
+        const timeSpent = Math.round((Date.now() - this.sessionStartTime) / 1000 / 60);
+
+        document.getElementById('finalScore').textContent = this.score;
+        document.getElementById('finalAccuracy').textContent = accuracy + '%';
+        document.getElementById('finalXP').textContent = xpEarned;
+        document.getElementById('finalStreak').textContent = this.correctAnswers;
+
+        if (window.app && window.app.progressTracker) {
+          window.app.progressTracker.updateLevelProgress(
+            'level2', this.correctAnswers, this.questions.length, xpEarned
+          );
+        }
+
+        if (window.app && window.app.questManager) {
+          window.app.questManager.trackLevelCompletion(accuracy);
+          window.app.questManager.trackStudyTime(timeSpent);
+        }
+
+        document.getElementById('quizContainer').classList.add('hidden');
+        document.getElementById('lessonComplete').classList.remove('hidden');
+      }
+
+      shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      }
+    }
+
+    const learningSystem = new Level2LearningSystem();
+
+    function submitAnswer() { learningSystem.submitAnswer(); }
+    function nextQuestion() { learningSystem.nextQuestion(); }
+    function goToMenu() { window.location.href = '../index.html'; }
+    function retryLesson() { window.location.reload(); }
+    function nextLevel() { window.location.href = 'level3.html'; }
+
+    window.onload = function() {
+      createStars();
+      learningSystem.initialize();
+    };
+  </script>
+</body>
+</html>
+</parameter>

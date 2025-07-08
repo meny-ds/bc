@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Quest - Level 5-6: Loops & Functions</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <style>
+    .quiz-container {
+      background: rgba(41, 41, 72, 0.9);
+      backdrop-filter: blur(15px);
+      margin: 20px auto;
+      padding: 40px;
+      border-radius: 25px;
+      border: 2px solid #9c27b0;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      max-width: 800px;
+    }
+    
+    .question-number {
+      background: rgba(156, 39, 176, 0.2);
+      color: #9c27b0;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      margin-bottom: 15px;
+      display: inline-block;
+    }
+    
+    .option-button:hover {
+      border-color: #9c27b0;
+      background: rgba(156, 39, 176, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .option-button.selected {
+      border-color: #9c27b0;
+      background: rgba(156, 39, 176, 0.2);
+    }
+    
+    .code-input:focus {
+      outline: none;
+      border-color: #9c27b0;
+      box-shadow: 0 0 15px rgba(156, 39, 176, 0.3);
+    }
+    
+    .button {
+      background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+      color: white;
+    }
+    
+    .button:hover {
+      background: linear-gradient(45deg, #8e24aa, #6a1b9a);
+    }
+    
+    .nav-btn {
+      color: #9c27b0;
+      border: 2px solid #9c27b0;
+    }
+    
+    .nav-btn:hover {
+      background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  
+  <div class="container">
+    <header class="main-header">
+      <h1>🔄 Level 5-6: Loops & Functions</h1>
+      <p>Repetition, automation, and code organization</p>
+    </header>
+
+    <!-- Quiz System -->
+    <div id="quizContainer" class="quiz-container">
+      <div class="question-header">
+        <div class="question-number" id="questionNumber">Question 1 of 15</div>
+        <div class="question-text" id="questionText">Which keyword is used to create a for loop in Python?</div>
+      </div>
+      
+      <div id="questionContent"></div>
+      <div class="question-options" id="questionOptions"></div>
+      
+      <div id="feedbackContainer" class="feedback-container hidden">
+        <div id="feedbackText"></div>
+        <div id="explanationText" class="explanation"></div>
+      </div>
+      
+      <div style="text-align: center; margin-top: 30px;">
+        <button class="button" id="submitButton" onclick="submitAnswer()" disabled>Submit Answer</button>
+        <button class="button hidden" id="nextButton" onclick="nextQuestion()">Next Question</button>
+      </div>
+    </div>
+
+    <!-- Lesson Complete Screen -->
+    <div id="lessonComplete" class="lesson-complete hidden">
+      <h2>🎉 Level Complete!</h2>
+      <div class="stats-display">
+        <div class="stat-card">
+          <div class="stat-value" id="finalScore">0</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="finalAccuracy">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="finalXP">0</div>
+          <div class="stat-label">XP Earned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="finalStreak">0</div>
+          <div class="stat-label">Streak</div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 30px;">
+        <button class="button" onclick="goToMenu()">🏠 Main Menu</button>
+        <button class="button" onclick="retryLesson()">🔄 Retry Lesson</button>
+        <button class="button" onclick="nextLevel()">Next Level →</button>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <a href="level2.html" class="nav-btn">← Level 3-4</a>
+      <a href="../index.html" class="nav-btn">🏠 Main Menu</a>
+      <a href="level4.html" class="nav-btn">Level 7-8 →</a>
+    </div>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script>
+    // Question Bank for Level 5-6
+    const questionBank = [
+      {
+        id: 'loop_1',
+        type: 'multiple-choice',
+        question: 'Which keyword is used to create a for loop in Python?',
+        options: ['loop', 'for', 'repeat', 'iterate'],
+        correct: 1,
+        explanation: 'The "for" keyword is used to create for loops in Python.',
+        category: 'loops',
+        difficulty: 'easy',
+        topic: 'loops'
+      },
+      {
+        id: 'loop_2',
+        type: 'multiple-choice',
+        question: 'What will range(5) generate?',
+        options: ['1, 2, 3, 4, 5', '0, 1, 2, 3, 4', '0, 1, 2, 3, 4, 5', '1, 2, 3, 4'],
+        correct: 1,
+        explanation: 'range(5) generates numbers from 0 to 4 (5 is excluded).',
+        category: 'range',
+        difficulty: 'easy',
+        topic: 'loops'
+      },
+      {
+        id: 'func_1',
+        type: 'multiple-choice',
+        question: 'What keyword is used to define a function in Python?',
+        options: ['function', 'def', 'define', 'func'],
+        correct: 1,
+        explanation: 'The "def" keyword is used to define functions in Python.',
+        category: 'functions',
+        difficulty: 'easy',
+        topic: 'functions'
+      },
+      {
+        id: 'loop_3',
+        type: 'code-writing',
+        question: 'Write a for loop that prints numbers from 1 to 5:',
+        answer: 'for i in range(1, 6):\n    print(i)',
+        explanation: 'Use range(1, 6) to get numbers 1 through 5, then print each number.',
+        category: 'loops',
+        difficulty: 'easy',
+        topic: 'loops'
+      },
+      {
+        id: 'func_2',
+        type: 'code-writing',
+        question: 'Write a function that takes a name and returns "Hello, [name]!":',
+        answer: 'def greet(name):\n    return "Hello, " + name + "!"',
+        explanation: 'Define a function with def, take name as parameter, and return the greeting string.',
+        category: 'functions',
+        difficulty: 'easy',
+        topic: 'functions'
+      },
+      {
+        id: 'loop_4',
+        type: 'multiple-choice',
+        question: 'What does a while loop do?',
+        options: [
+          'Runs a fixed number of times',
+          'Runs while a condition is True',
+          'Runs only once',
+          'Never runs'
+        ],
+        correct: 1,
+        explanation: 'A while loop continues running as long as its condition remains True.',
+        category: 'loops',
+        difficulty: 'easy',
+        topic: 'loops'
+      },
+      {
+        id: 'func_3',
+        type: 'multiple-choice',
+        question: 'How do you create an empty list in Python?',
+        options: ['list = empty', 'list = []', 'list = ()', 'list = {}'],
+        correct: 1,
+        explanation: 'Empty lists are created using square brackets: []',
+        category: 'lists',
+        difficulty: 'easy',
+        topic: 'lists'
+      },
+      {
+        id: 'loop_5',
+        type: 'code-writing',
+        question: 'Write a loop to calculate the sum of numbers from 1 to 10:',
+        answer: 'total = 0\nfor i in range(1, 11):\n    total += i',
+        explanation: 'Initialize a total variable, then add each number from 1 to 10 to it.',
+        category: 'loops',
+        difficulty: 'medium',
+        topic: 'loops'
+      },
+      {
+        id: 'func_4',
+        type: 'multiple-choice',
+        question: 'What does this function return?\ndef multiply(a, b):\n    return a * b\nresult = multiply(3, 4)',
+        options: ['7', '12', '34', 'Error'],
+        correct: 1,
+        explanation: 'The function multiplies 3 * 4 = 12.',
+        category: 'functions',
+        difficulty: 'medium',
+        topic: 'functions'
+      },
+      {
+        id: 'func_5',
+        type: 'code-writing',
+        question: 'Write a function that returns the length of a list:',
+        answer: 'def get_length(my_list):\n    return len(my_list)',
+        explanation: 'Use the len() function to get the length of a list and return it.',
+        category: 'functions',
+        difficulty: 'medium',
+        topic: 'functions'
+      },
+      {
+        id: 'loop_6',
+        type: 'multiple-choice',
+        question: 'What will this code output?\nfor i in range(3):\n    for j in range(2):\n        print(i, j)',
+        options: [
+          '0 0, 0 1, 1 0, 1 1, 2 0, 2 1',
+          '0 0, 1 1, 2 2',
+          '3 2',
+          'Error'
+        ],
+        correct: 0,
+        explanation: 'Nested loops: outer loop runs 3 times (0,1,2), inner loop runs 2 times (0,1) for each outer iteration.',
+        category: 'nested-loops',
+        difficulty: 'hard',
+        topic: 'loops'
+      },
+      {
+        id: 'func_6',
+        type: 'code-writing',
+        question: 'Write a function that finds the maximum number in a list:',
+        answer: 'def find_max(numbers):\n    return max(numbers)',
+        explanation: 'Use the built-in max() function to find the largest number in a list.',
+        category: 'functions',
+        difficulty: 'hard',
+        topic: 'functions'
+      },
+      {
+        id: 'list_1',
+        type: 'multiple-choice',
+        question: 'How do you add an item to the end of a list?',
+        options: ['list.add(item)', 'list.append(item)', 'list.insert(item)', 'list.push(item)'],
+        correct: 1,
+        explanation: 'The append() method adds an item to the end of a list.',
+        category: 'lists',
+        difficulty: 'easy',
+        topic: 'lists'
+      },
+      {
+        id: 'loop_7',
+        type: 'code-writing',
+        question: 'Write a while loop that counts down from 5 to 1:',
+        answer: 'count = 5\nwhile count > 0:\n    print(count)\n    count -= 1',
+        explanation: 'Start with count = 5, check if count > 0, print count, then decrease count by 1.',
+        category: 'loops',
+        difficulty: 'medium',
+        topic: 'loops'
+      },
+      {
+        id: 'func_7',
+        type: 'code-writing',
+        question: 'Write a function that calculates the area of a circle (area = π * r²):',
+        answer: 'def circle_area(radius):\n    return 3.14159 * radius ** 2',
+        explanation: 'Use the formula π * r² where π ≈ 3.14159 and ** is the exponentiation operator.',
+        category: 'functions',
+        difficulty: 'medium',
+        topic: 'functions'
+      }
+    ];
+
+    // Level Learning System
+    class Level3LearningSystem {
+      constructor() {
+        this.currentQuestionIndex = 0;
+        this.questions = [];
+        this.userAnswers = [];
+        this.score = 0;
+        this.correctAnswers = 0;
+        this.selectedAnswer = null;
+        this.hasAnswered = false;
+        this.questionStartTime = null;
+        this.sessionStartTime = Date.now();
+      }
+
+      async initialize() {
+        if (window.app && window.app.adaptiveLearning) {
+          this.questions = window.app.adaptiveLearning.getAdaptiveQuestions(questionBank, 15);
+        } else {
+          this.questions = this.shuffleArray(questionBank).slice(0, 15);
+        }
+        
+        this.displayQuestion();
+      }
+
+      displayQuestion() {
+        if (this.currentQuestionIndex >= this.questions.length) {
+          this.completeLesson();
+          return;
+        }
+
+        const question = this.questions[this.currentQuestionIndex];
+        this.selectedAnswer = null;
+        this.hasAnswered = false;
+        this.questionStartTime = Date.now();
+
+        document.getElementById('questionNumber').textContent = 
+          `Question ${this.currentQuestionIndex + 1} of ${this.questions.length}`;
+        document.getElementById('questionText').textContent = question.question;
+
+        document.getElementById('questionContent').innerHTML = '';
+        document.getElementById('questionOptions').innerHTML = '';
+        document.getElementById('feedbackContainer').classList.add('hidden');
+        document.getElementById('submitButton').disabled = true;
+        document.getElementById('nextButton').classList.add('hidden');
+
+        this.displayQuestionByType(question);
+      }
+
+      displayQuestionByType(question) {
+        const optionsContainer = document.getElementById('questionOptions');
+        const contentContainer = document.getElementById('questionContent');
+
+        switch (question.type) {
+          case 'multiple-choice':
+            question.options.forEach((option, index) => {
+              const button = document.createElement('button');
+              button.className = 'option-button';
+              button.textContent = option;
+              button.onclick = () => this.selectOption(index);
+              optionsContainer.appendChild(button);
+            });
+            break;
+
+          case 'code-writing':
+            const textarea = document.createElement('textarea');
+            textarea.className = 'code-input';
+            textarea.placeholder = 'Write your Python code here...';
+            textarea.oninput = () => {
+              this.selectedAnswer = textarea.value.trim();
+              document.getElementById('submitButton').disabled = !this.selectedAnswer;
+            };
+            contentContainer.appendChild(textarea);
+            break;
+        }
+      }
+
+      selectOption(index) {
+        if (this.hasAnswered) return;
+
+        document.querySelectorAll('.option-button').forEach(btn => {
+          btn.classList.remove('selected');
+        });
+
+        document.querySelectorAll('.option-button')[index].classList.add('selected');
+        this.selectedAnswer = index;
+        document.getElementById('submitButton').disabled = false;
+      }
+
+      submitAnswer() {
+        if (this.hasAnswered || this.selectedAnswer === null) return;
+
+        const question = this.questions[this.currentQuestionIndex];
+        const timeSpent = (Date.now() - this.questionStartTime) / 1000;
+        let isCorrect = false;
+
+        switch (question.type) {
+          case 'multiple-choice':
+            isCorrect = this.selectedAnswer === question.correct;
+            break;
+          
+          case 'code-writing':
+            isCorrect = this.checkCodeAnswer(this.selectedAnswer, question.answer);
+            break;
+        }
+
+        this.hasAnswered = true;
+        this.processAnswer(isCorrect, question, timeSpent);
+      }
+
+      checkCodeAnswer(userAnswer, correctAnswer) {
+        const normalize = (code) => code.toLowerCase().replace(/\s+/g, ' ').trim();
+        const userNorm = normalize(userAnswer);
+        const correctNorm = normalize(correctAnswer);
+        
+        return userNorm.includes(correctNorm) || 
+               correctNorm.includes(userNorm) ||
+               this.checkCodeSimilarity(userNorm, correctNorm);
+      }
+
+      checkCodeSimilarity(user, correct) {
+        const userWords = user.split(' ');
+        const correctWords = correct.split(' ');
+        
+        let matches = 0;
+        correctWords.forEach(word => {
+          if (userWords.includes(word)) matches++;
+        });
+        
+        return matches / correctWords.length >= 0.7;
+      }
+
+      processAnswer(isCorrect, question, timeSpent) {
+        if (window.app && window.app.progressTracker) {
+          window.app.progressTracker.recordAnswer(
+            question.id, isCorrect, question.topic, question.difficulty, timeSpent, 'level3'
+          );
+        }
+
+        if (window.app && window.app.questManager) {
+          window.app.questManager.trackAnswer(isCorrect, question.topic, question.difficulty, timeSpent);
+        }
+
+        if (isCorrect) {
+          this.correctAnswers++;
+          this.score += this.calculatePoints(question.difficulty, timeSpent);
+        }
+
+        this.showFeedback(isCorrect, question);
+        
+        if (question.type === 'multiple-choice') {
+          this.updateOptionVisuals(isCorrect, question.correct);
+        }
+
+        document.getElementById('submitButton').classList.add('hidden');
+        document.getElementById('nextButton').classList.remove('hidden');
+      }
+
+      calculatePoints(difficulty, timeSpent) {
+        const points = { easy: 20, medium: 35, hard: 50 };
+        let basePoints = points[difficulty] || 20;
+        
+        if (timeSpent < 15) basePoints *= 1.5;
+        else if (timeSpent < 30) basePoints *= 1.2;
+        
+        return Math.round(basePoints);
+      }
+
+      showFeedback(isCorrect, question) {
+        const container = document.getElementById('feedbackContainer');
+        const feedbackText = document.getElementById('feedbackText');
+        const explanationText = document.getElementById('explanationText');
+
+        container.classList.remove('hidden', 'feedback-correct', 'feedback-incorrect');
+        
+        if (isCorrect) {
+          container.classList.add('feedback-correct');
+          feedbackText.textContent = '✅ Outstanding! You\'re mastering advanced concepts!';
+        } else {
+          container.classList.add('feedback-incorrect');
+          feedbackText.textContent = '❌ Not quite right. Advanced concepts take practice!';
+        }
+
+        explanationText.textContent = question.explanation;
+      }
+
+      updateOptionVisuals(isCorrect, correctIndex) {
+        const options = document.querySelectorAll('.option-button');
+        
+        options.forEach((option, index) => {
+          option.classList.add('disabled');
+          
+          if (index === correctIndex) {
+            option.classList.add('correct');
+          } else if (index === this.selectedAnswer && !isCorrect) {
+            option.classList.add('incorrect');
+          }
+        });
+      }
+
+      nextQuestion() {
+        this.currentQuestionIndex++;
+        this.displayQuestion();
+      }
+
+      completeLesson() {
+        const accuracy = Math.round((this.correctAnswers / this.questions.length) * 100);
+        const xpEarned = this.score;
+        const timeSpent = Math.round((Date.now() - this.sessionStartTime) / 1000 / 60);
+
+        document.getElementById('finalScore').textContent = this.score;
+        document.getElementById('finalAccuracy').textContent = accuracy + '%';
+        document.getElementById('finalXP').textContent = xpEarned;
+        document.getElementById('finalStreak').textContent = this.correctAnswers;
+
+        if (window.app && window.app.progressTracker) {
+          window.app.progressTracker.updateLevelProgress(
+            'level3', this.correctAnswers, this.questions.length, xpEarned
+          );
+        }
+
+        if (window.app && window.app.questManager) {
+          window.app.questManager.trackLevelCompletion(accuracy);
+          window.app.questManager.trackStudyTime(timeSpent);
+        }
+
+        document.getElementById('quizContainer').classList.add('hidden');
+        document.getElementById('lessonComplete').classList.remove('hidden');
+      }
+
+      shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      }
+    }
+
+    const learningSystem = new Level3LearningSystem();
+
+    function submitAnswer() { learningSystem.submitAnswer(); }
+    function nextQuestion() { learningSystem.nextQuestion(); }
+    function goToMenu() { window.location.href = '../index.html'; }
+    function retryLesson() { window.location.reload(); }
+    function nextLevel() { window.location.href = 'level4.html'; }
+
+    window.onload = function() {
+      createStars();
+      learningSystem.initialize();
+    };
+  </script>
+</body>
+</html>
+</parameter>

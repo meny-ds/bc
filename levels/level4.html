@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Quest - Level 7-8: Interactive & Visual Programming</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <style>
+    .quiz-container {
+      background: rgba(41, 41, 72, 0.9);
+      backdrop-filter: blur(15px);
+      margin: 20px auto;
+      padding: 40px;
+      border-radius: 25px;
+      border: 2px solid #f8b500;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      max-width: 800px;
+    }
+    
+    .question-number {
+      background: rgba(248, 181, 0, 0.2);
+      color: #f8b500;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      margin-bottom: 15px;
+      display: inline-block;
+    }
+    
+    .option-button:hover {
+      border-color: #f8b500;
+      background: rgba(248, 181, 0, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .option-button.selected {
+      border-color: #f8b500;
+      background: rgba(248, 181, 0, 0.2);
+    }
+    
+    .code-input:focus {
+      outline: none;
+      border-color: #f8b500;
+      box-shadow: 0 0 15px rgba(248, 181, 0, 0.3);
+    }
+    
+    .button {
+      background: linear-gradient(45deg, #f8b500, #ff6b9d);
+      color: #000;
+    }
+    
+    .button:hover {
+      background: linear-gradient(45deg, #ff6b9d, #f8b500);
+    }
+    
+    .nav-btn {
+      color: #f8b500;
+      border: 2px solid #f8b500;
+    }
+    
+    .nav-btn:hover {
+      background: linear-gradient(45deg, #f8b500, #ff6b9d);
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  
+  <div class="container">
+    <header class="main-header">
+      <h1>🎨 Level 7-8: Interactive & Visual Programming</h1>
+      <p>User interaction, graphics, and creative programming</p>
+    </header>
+
+    <!-- Quiz System -->
+    <div id="quizContainer" class="quiz-container">
+      <div class="question-header">
+        <div class="question-number" id="questionNumber">Question 1 of 18</div>
+        <div class="question-text" id="questionText">What function is used to get user input in Python?</div>
+      </div>
+      
+      <div id="questionContent"></div>
+      <div class="question-options" id="questionOptions"></div>
+      
+      <div id="feedbackContainer" class="feedback-container hidden">
+        <div id="feedbackText"></div>
+        <div id="explanationText" class="explanation"></div>
+      </div>
+      
+      <div style="text-align: center; margin-top: 30px;">
+        <button class="button" id="submitButton" onclick="submitAnswer()" disabled>Submit Answer</button>
+        <button class="button hidden" id="nextButton" onclick="nextQuestion()">Next Question</button>
+      </div>
+    </div>
+
+    <!-- Lesson Complete Screen -->
+    <div id="lessonComplete" class="lesson-complete hidden">
+      <h2>🎉 Level Complete!</h2>
+      <div class="stats-display">
+        <div class="stat-card">
+          <div class="stat-value" id="finalScore">0</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="finalAccuracy">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="finalXP">0</div>
+          <div class="stat-label">XP Earned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="finalStreak">0</div>
+          <div class="stat-label">Streak</div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 30px;">
+        <button class="button" onclick="goToMenu()">🏠 Main Menu</button>
+        <button class="button" onclick="retryLesson()">🔄 Retry Lesson</button>
+        <button class="button" onclick="nextLevel()">Next Level →</button>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <a href="level3.html" class="nav-btn">← Level 5-6</a>
+      <a href="../index.html" class="nav-btn">🏠 Main Menu</a>
+      <a href="level5.html" class="nav-btn">Level 9-10 →</a>
+    </div>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script>
+    // Question Bank for Level 7-8
+    const questionBank = [
+      {
+        id: 'input_1',
+        type: 'multiple-choice',
+        question: 'What function is used to get user input in Python?',
+        options: ['get()', 'input()', 'read()', 'scan()'],
+        correct: 1,
+        explanation: 'The input() function is used to get text input from the user.',
+        category: 'input',
+        difficulty: 'easy',
+        topic: 'input'
+      },
+      {
+        id: 'input_2',
+        type: 'code-writing',
+        question: 'Write code to ask the user for their age and store it in a variable:',
+        answer: 'age = input("What is your age? ")',
+        explanation: 'Use input() with a prompt message to ask for the user\'s age.',
+        category: 'input',
+        difficulty: 'easy',
+        topic: 'input'
+      },
+      {
+        id: 'visual_1',
+        type: 'multiple-choice',
+        question: 'Which Python library is commonly used for creating graphics and games?',
+        options: ['matplotlib', 'pygame', 'numpy', 'requests'],
+        correct: 1,
+        explanation: 'pygame is a popular library for creating games and graphics in Python.',
+        category: 'libraries',
+        difficulty: 'easy',
+        topic: 'graphics'
+      },
+      {
+        id: 'input_3',
+        type: 'multiple-choice',
+        question: 'What data type does input() always return?',
+        options: ['integer', 'float', 'string', 'boolean'],
+        correct: 2,
+        explanation: 'input() always returns a string, even if the user enters numbers.',
+        category: 'input',
+        difficulty: 'medium',
+        topic: 'input'
+      },
+      {
+        id: 'visual_2',
+        type: 'multiple-choice',
+        question: 'What does ASCII art use to create images?',
+        options: ['Colors', 'Text characters', 'Pixels', 'Vectors'],
+        correct: 1,
+        explanation: 'ASCII art creates images using text characters like *, #, and spaces.',
+        category: 'ascii-art',
+        difficulty: 'easy',
+        topic: 'graphics'
+      },
+      {
+        id: 'input_4',
+        type: 'code-writing',
+        question: 'Write code that asks for a password and checks if it equals "secret123":',
+        answer: 'password = input("Enter password: ")\nif password == "secret123":\n    print("Access granted")\nelse:\n    print("Access denied")',
+        explanation: 'Get input, then use an if statement to compare with the correct password.',
+        category: 'validation',
+        difficulty: 'medium',
+        topic: 'input'
+      },
+      {
+        id: 'visual_3',
+        type: 'code-writing',
+        question: 'Write code to print a simple triangle pattern using asterisks (*):',
+        answer: 'for i in range(1, 4):\n    print("*" * i)',
+        explanation: 'Use a loop to print increasing numbers of asterisks to form a triangle.',
+        category: 'patterns',
+        difficulty: 'medium',
+        topic: 'graphics'
+      },
+      {
+        id: 'input_5',
+        type: 'multiple-choice',
+        question: 'What happens when you use input() in a program?',
+        options: [
+          'The program continues immediately',
+          'The program waits for user input',
+          'The program crashes',
+          'Nothing happens'
+        ],
+        correct: 1,
+        explanation: 'input() pauses the program and waits for the user to type something and press Enter.',
+        category: 'input',
+        difficulty: 'easy',
+        topic: 'input'
+      },
+      {
+        id: 'visual_4',
+        type: 'multiple-choice',
+        question: 'What will this code create?\nfor i in range(5):\n    print(" " * (4-i) + "*" * (2*i+1))',
+        options: ['Rectangle', 'Triangle', 'Diamond top half', 'Line'],
+        correct: 2,
+        explanation: 'This creates the top half of a diamond by adding spaces and increasing stars.',
+        category: 'patterns',
+        difficulty: 'hard',
+        topic: 'graphics'
+      },
+      {
+        id: 'input_6',
+        type: 'code-writing',
+        question: 'Create a simple calculator that asks for two numbers and an operation (+, -, *, /):',
+        answer: 'num1 = float(input("First number: "))\nnum2 = float(input("Second number: "))\nop = input("Operation (+, -, *, /): ")\nif op == "+":\n    result = num1 + num2\nelif op == "-":\n    result = num1 - num2\nelif op == "*":\n    result = num1 * num2\nelif op == "/":\n    result = num1 / num2\nprint("Result:", result)',
+        explanation: 'Get two numbers and an operation, then use if-elif to perform the calculation.',
+        category: 'interactive-programs',
+        difficulty: 'hard',
+        topic: 'input'
+      },
+      {
+        id: 'visual_5',
+        type: 'code-writing',
+        question: 'Write code to create a simple progress bar that fills up:',
+        answer: 'import time\nfor i in range(11):\n    bar = "█" * i + "░" * (10-i)\n    print(f"[{bar}] {i*10}%")\n    time.sleep(0.1)',
+        explanation: 'Use a loop with filled and empty characters to show progress, with time.sleep() for animation.',
+        category: 'animation',
+        difficulty: 'hard',
+        topic: 'graphics'
+      },
+      {
+        id: 'visual_6',
+        type: 'multiple-choice',
+        question: 'What is the purpose of the "end" parameter in print()?',
+        options: [
+          'To end the program',
+          'To control what comes after the printed text',
+          'To print at the end of the file',
+          'To create an error'
+        ],
+        correct: 1,
+        explanation: 'The end parameter controls what character is printed after the text (default is newline).',
+        category: 'output-formatting',
+        difficulty: 'medium',
+        topic: 'output'
+      },
+      {
+        id: 'input_7',
+        type: 'code-writing',
+        question: 'Write a number guessing game where the user guesses a number between 1 and 10:',
+        answer: 'import random\nsecret = random.randint(1, 10)\nguess = int(input("Guess a number 1-10: "))\nif guess == secret:\n    print("Correct!")\nelse:\n    print(f"Wrong! The number was {secret}")',
+        explanation: 'Use random.randint() to generate a secret number, then compare with user input.',
+        category: 'games',
+        difficulty: 'medium',
+        topic: 'input'
+      },
+      {
+        id: 'visual_7',
+        type: 'code-writing',
+        question: 'Create a function that draws a box with a given width and height:',
+        answer: 'def draw_box(width, height):\n    for i in range(height):\n        if i == 0 or i == height - 1:\n            print("*" * width)\n        else:\n            print("*" + " " * (width - 2) + "*")',
+        explanation: 'Draw solid lines for top/bottom, and hollow lines with spaces for the sides.',
+        category: 'functions',
+        difficulty: 'hard',
+        topic: 'graphics'
+      },
+      {
+        id: 'input_8',
+        type: 'code-writing',
+        question: 'Write code to convert user input to an integer safely:',
+        answer: 'try:\n    number = int(input("Enter a number: "))\n    print(f"You entered: {number}")\nexcept ValueError:\n    print("That\'s not a valid number!")',
+        explanation: 'Use try-except to handle cases where the user enters non-numeric input.',
+        category: 'error-handling',
+        difficulty: 'hard',
+        topic: 'input'
+      },
+      {
+        id: 'visual_8',
+        type: 'code-writing',
+        question: 'Write code to create a checkerboard pattern:',
+        answer: 'for i in range(8):\n    for j in range(8):\n        if (i + j) % 2 == 0:\n            print("█", end="")\n        else:\n            print("░", end="")\n    print()',
+        explanation: 'Use the sum of row and column indices to alternate between two characters.',
+        category: 'patterns',
+        difficulty: 'hard',
+        topic: 'graphics'
+      },
+      {
+        id: 'interactive_1',
+        type: 'code-writing',
+        question: 'Create an interactive menu system with 3 options:',
+        answer: 'while True:\n    print("1. Say Hello")\n    print("2. Calculate Square")\n    print("3. Exit")\n    choice = input("Choose an option: ")\n    if choice == "1":\n        print("Hello!")\n    elif choice == "2":\n        num = int(input("Enter a number: "))\n        print(f"Square: {num**2}")\n    elif choice == "3":\n        break\n    else:\n        print("Invalid choice!")',
+        explanation: 'Use a while loop with a menu, get user choice, and perform different actions based on input.',
+        category: 'interactive-programs',
+        difficulty: 'hard',
+        topic: 'input'
+      },
+      {
+        id: 'visual_9',
+        type: 'code-writing',
+        question: 'Write code to animate a bouncing ball using text:',
+        answer: 'import time\nposition = 0\ndirection = 1\nfor _ in range(20):\n    print(" " * position + "O")\n    position += direction\n    if position >= 10 or position <= 0:\n        direction *= -1\n    time.sleep(0.2)',
+        explanation: 'Use position and direction variables to move a character back and forth.',
+        category: 'animation',
+        difficulty: 'hard',
+        topic: 'graphics'
+      }
+    ];
+
+    // Level Learning System
+    class Level4LearningSystem {
+      constructor() {
+        this.currentQuestionIndex = 0;
+        this.questions = [];
+        this.userAnswers = [];
+        this.score = 0;
+        this.correctAnswers = 0;
+        this.selectedAnswer = null;
+        this.hasAnswered = false;
+        this.questionStartTime = null;
+        this.sessionStartTime = Date.now();
+      }
+
+      async initialize() {
+        if (window.app && window.app.adaptiveLearning) {
+          this.questions = window.app.adaptiveLearning.getAdaptiveQuestions(questionBank, 18);
+        } else {
+          this.questions = this.shuffleArray(questionBank).slice(0, 18);
+        }
+        
+        this.displayQuestion();
+      }
+
+      displayQuestion() {
+        if (this.currentQuestionIndex >= this.questions.length) {
+          this.completeLesson();
+          return;
+        }
+
+        const question = this.questions[this.currentQuestionIndex];
+        this.selectedAnswer = null;
+        this.hasAnswered = false;
+        this.questionStartTime = Date.now();
+
+        document.getElementById('questionNumber').textContent = 
+          `Question ${this.currentQuestionIndex + 1} of ${this.questions.length}`;
+        document.getElementById('questionText').textContent = question.question;
+
+        document.getElementById('questionContent').innerHTML = '';
+        document.getElementById('questionOptions').innerHTML = '';
+        document.getElementById('feedbackContainer').classList.add('hidden');
+        document.getElementById('submitButton').disabled = true;
+        document.getElementById('nextButton').classList.add('hidden');
+
+        this.displayQuestionByType(question);
+      }
+
+      displayQuestionByType(question) {
+        const optionsContainer = document.getElementById('questionOptions');
+        const contentContainer = document.getElementById('questionContent');
+
+        switch (question.type) {
+          case 'multiple-choice':
+            question.options.forEach((option, index) => {
+              const button = document.createElement('button');
+              button.className = 'option-button';
+              button.textContent = option;
+              button.onclick = () => this.selectOption(index);
+              optionsContainer.appendChild(button);
+            });
+            break;
+
+          case 'code-writing':
+            const textarea = document.createElement('textarea');
+            textarea.className = 'code-input';
+            textarea.placeholder = 'Write your Python code here...';
+            textarea.oninput = () => {
+              this.selectedAnswer = textarea.value.trim();
+              document.getElementById('submitButton').disabled = !this.selectedAnswer;
+            };
+            contentContainer.appendChild(textarea);
+            break;
+        }
+      }
+
+      selectOption(index) {
+        if (this.hasAnswered) return;
+
+        document.querySelectorAll('.option-button').forEach(btn => {
+          btn.classList.remove('selected');
+        });
+
+        document.querySelectorAll('.option-button')[index].classList.add('selected');
+        this.selectedAnswer = index;
+        document.getElementById('submitButton').disabled = false;
+      }
+
+      submitAnswer() {
+        if (this.hasAnswered || this.selectedAnswer === null) return;
+
+        const question = this.questions[this.currentQuestionIndex];
+        const timeSpent = (Date.now() - this.questionStartTime) / 1000;
+        let isCorrect = false;
+
+        switch (question.type) {
+          case 'multiple-choice':
+            isCorrect = this.selectedAnswer === question.correct;
+            break;
+          
+          case 'code-writing':
+            isCorrect = this.checkCodeAnswer(this.selectedAnswer, question.answer);
+            break;
+        }
+
+        this.hasAnswered = true;
+        this.processAnswer(isCorrect, question, timeSpent);
+      }
+
+      checkCodeAnswer(userAnswer, correctAnswer) {
+        const normalize = (code) => code.toLowerCase().replace(/\s+/g, ' ').trim();
+        const userNorm = normalize(userAnswer);
+        const correctNorm = normalize(correctAnswer);
+        
+        return userNorm.includes(correctNorm) || 
+               correctNorm.includes(userNorm) ||
+               this.checkAdvancedSimilarity(userNorm, correctNorm);
+      }
+
+      checkAdvancedSimilarity(user, correct) {
+        const userWords = user.split(' ');
+        const correctWords = correct.split(' ');
+        
+        let matches = 0;
+        correctWords.forEach(word => {
+          if (userWords.includes(word)) matches++;
+        });
+        
+        const keyPatterns = ['input', 'print', 'for', 'range', 'if', 'while', 'def'];
+        const userPatterns = keyPatterns.filter(pattern => user.includes(pattern));
+        const correctPatterns = keyPatterns.filter(pattern => correct.includes(pattern));
+        
+        const patternMatch = userPatterns.length >= correctPatterns.length * 0.8;
+        const wordMatch = matches / correctWords.length >= 0.6;
+        
+        return patternMatch && wordMatch;
+      }
+
+      processAnswer(isCorrect, question, timeSpent) {
+        if (window.app && window.app.progressTracker) {
+          window.app.progressTracker.recordAnswer(
+            question.id, isCorrect, question.topic, question.difficulty, timeSpent, 'level4'
+          );
+        }
+
+        if (window.app && window.app.questManager) {
+          window.app.questManager.trackAnswer(isCorrect, question.topic, question.difficulty, timeSpent);
+        }
+
+        if (isCorrect) {
+          this.correctAnswers++;
+          this.score += this.calculatePoints(question.difficulty, timeSpent);
+        }
+
+        this.showFeedback(isCorrect, question);
+        
+        if (question.type === 'multiple-choice') {
+          this.updateOptionVisuals(isCorrect, question.correct);
+        }
+
+        document.getElementById('submitButton').classList.add('hidden');
+        document.getElementById('nextButton').classList.remove('hidden');
+      }
+
+      calculatePoints(difficulty, timeSpent) {
+        const points = { easy: 25, medium: 40, hard: 60 };
+        let basePoints = points[difficulty] || 25;
+        
+        if (timeSpent < 15) basePoints *= 1.5;
+        else if (timeSpent < 30) basePoints *= 1.2;
+        
+        return Math.round(basePoints);
+      }
+
+      showFeedback(isCorrect, question) {
+        const container = document.getElementById('feedbackContainer');
+        const feedbackText = document.getElementById('feedbackText');
+        const explanationText = document.getElementById('explanationText');
+
+        container.classList.remove('hidden', 'feedback-correct', 'feedback-incorrect');
+        
+        if (isCorrect) {
+          container.classList.add('feedback-correct');
+          feedbackText.textContent = '✅ Fantastic! You\'re creating interactive magic!';
+        } else {
+          container.classList.add('feedback-incorrect');
+          feedbackText.textContent = '❌ Close! Interactive programming takes creativity!';
+        }
+
+        explanationText.textContent = question.explanation;
+      }
+
+      updateOptionVisuals(isCorrect, correctIndex) {
+        const options = document.querySelectorAll('.option-button');
+        
+        options.forEach((option, index) => {
+          option.classList.add('disabled');
+          
+          if (index === correctIndex) {
+            option.classList.add('correct');
+          } else if (index === this.selectedAnswer && !isCorrect) {
+            option.classList.add('incorrect');
+          }
+        });
+      }
+
+      nextQuestion() {
+        this.currentQuestionIndex++;
+        this.displayQuestion();
+      }
+
+      completeLesson() {
+        const accuracy = Math.round((this.correctAnswers / this.questions.length) * 100);
+        const xpEarned = this.score;
+        const timeSpent = Math.round((Date.now() - this.sessionStartTime) / 1000 / 60);
+
+        document.getElementById('finalScore').textContent = this.score;
+        document.getElementById('finalAccuracy').textContent = accuracy + '%';
+        document.getElementById('finalXP').textContent = xpEarned;
+        document.getElementById('finalStreak').textContent = this.correctAnswers;
+
+        if (window.app && window.app.progressTracker) {
+          window.app.progressTracker.updateLevelProgress(
+            'level4', this.correctAnswers, this.questions.length, xpEarned
+          );
+        }
+
+        if (window.app && window.app.questManager) {
+          window.app.questManager.trackLevelCompletion(accuracy);
+          window.app.questManager.trackStudyTime(timeSpent);
+        }
+
+        document.getElementById('quizContainer').classList.add('hidden');
+        document.getElementById('lessonComplete').classList.remove('hidden');
+      }
+
+      shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      }
+    }
+
+    const learningSystem = new Level4LearningSystem();
+
+    function submitAnswer() { learningSystem.submitAnswer(); }
+    function nextQuestion() { learningSystem.nextQuestion(); }
+    function goToMenu() { window.location.href = '../index.html'; }
+    function retryLesson() { window.location.reload(); }
+    function nextLevel() { window.location.href = 'level5.html'; }
+
+    window.onload = function() {
+      createStars();
+      learningSystem.initialize();
+    };
+  </script>
+</body>
+</html>
+</parameter>
